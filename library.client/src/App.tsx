@@ -1,6 +1,5 @@
 //import { useEffect, useState } from 'react';
 import './App.css';
-import * as React from 'React';
 
 //interface Forecast {
 //    date: string;
