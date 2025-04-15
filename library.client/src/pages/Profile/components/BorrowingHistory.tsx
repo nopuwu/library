@@ -1,12 +1,16 @@
 // src/pages/Profile/components/BorrowingHistory.tsx
 import { BookCard } from '../../../components/profile/BookCard';
 
+import greatGatsbyCover from '../../../assets/book-covers/great-gatsby.jpg';
+import mockingbirdCover from '../../../assets/book-covers/mockingbird.jpg';
+import nineteenEightyFourCover from '../../../assets/book-covers/1984.jpg';
+
 const mockHistory = [
 	{
 		id: '1',
 		title: 'The Great Gatsby',
 		author: 'F. Scott Fitzgerald',
-		coverImage: '/covers/great-gatsby.jpg',
+		coverImage: greatGatsbyCover,
 		borrowedDate: '2023-05-10',
 		dueDate: '2023-06-10',
 	},
@@ -14,11 +18,18 @@ const mockHistory = [
 		id: '2',
 		title: '1984',
 		author: 'George Orwell',
-		coverImage: '/covers/1984.jpg',
+		coverImage: nineteenEightyFourCover,
 		borrowedDate: '2023-07-15',
 		dueDate: '2023-08-15',
 	},
-	// Add more history items...
+	{
+		id: '3',
+		title: 'To Kill a Mockingbird',
+		author: 'Harper Lee',
+		coverImage: mockingbirdCover,
+		borrowedDate: '2023-06-01',
+		dueDate: '2023-07-01',
+	},
 ];
 
 export default function BorrowingHistory() {

@@ -3,6 +3,10 @@ import { useState } from 'react';
 import Header from '../../components/Header';
 import BookCard from '../../components/BookCard';
 
+import greatGatsbyCover from '../../assets/book-covers/great-gatsby.jpg';
+import mockingbirdCover from '../../assets/book-covers/mockingbird.jpg';
+import nineteenEightyFourCover from '../../assets/book-covers/1984.jpg';
+
 interface Book {
 	id: string;
 	title: string;
@@ -19,7 +23,7 @@ export default function BooksPage() {
 			id: '1',
 			title: 'The Great Gatsby',
 			author: 'F. Scott Fitzgerald',
-			coverImage: '/book-covers/great-gatsby.jpg',
+			coverImage: greatGatsbyCover,
 			description:
 				'A story of wealth, love, and the American Dream in the 1920s.',
 			available: true,
@@ -28,7 +32,7 @@ export default function BooksPage() {
 			id: '2',
 			title: 'To Kill a Mockingbird',
 			author: 'Harper Lee',
-			coverImage: '/book-covers/mockingbird.jpg',
+			coverImage: mockingbirdCover,
 			description:
 				'A powerful story of racial injustice and moral growth.',
 			available: false,
@@ -37,12 +41,11 @@ export default function BooksPage() {
 			id: '3',
 			title: '1984',
 			author: 'George Orwell',
-			coverImage: '/book-covers/1984.jpg',
+			coverImage: nineteenEightyFourCover,
 			description:
 				'A dystopian novel about totalitarianism and surveillance.',
 			available: true,
 		},
-		// Add more books as needed
 	]);
 
 	const handleBorrow = (bookId: string) => {

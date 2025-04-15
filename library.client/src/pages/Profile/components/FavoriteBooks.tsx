@@ -1,18 +1,28 @@
 // src/pages/Profile/components/FavoriteBooks.tsx
 import { BookCard } from '../../../components/profile/BookCard';
 
+import greatGatsbyCover from '../../../assets/book-covers/great-gatsby.jpg';
+import mockingbirdCover from '../../../assets/book-covers/mockingbird.jpg';
+import nineteenEightyFourCover from '../../../assets/book-covers/1984.jpg';
+
 const mockFavorites = [
 	{
 		id: '2',
 		title: 'To Kill a Mockingbird',
 		author: 'Harper Lee',
-		coverImage: '/covers/mockingbird.jpg',
+		coverImage: mockingbirdCover,
 	},
 	{
 		id: '3',
 		title: '1984',
 		author: 'George Orwell',
-		coverImage: '/covers/1984.jpg',
+		coverImage: nineteenEightyFourCover,
+	},
+	{
+		id: '1',
+		title: 'The Great Gatsby',
+		author: 'F. Scott Fitzgerald',
+		coverImage: greatGatsbyCover,
 	},
 ];
 

@@ -1,3 +1,7 @@
+import greatGatsbyCover from '../../../assets/book-covers/great-gatsby.jpg';
+import mockingbirdCover from '../../../assets/book-covers/mockingbird.jpg';
+import nineteenEightyFourCover from '../../../assets/book-covers/1984.jpg';
+
 export default function BorrowedBooks() {
 	const borrowedBooks = [
 		{
@@ -5,21 +9,21 @@ export default function BorrowedBooks() {
 			title: 'The Great Gatsby',
 			author: 'F. Scott Fitzgerald',
 			dueDate: '2023-06-15',
-			image: '/book-covers/great-gatsby.jpg',
+			image: greatGatsbyCover,
 		},
 		{
 			id: '2',
 			title: '1984',
 			author: 'George Orwell',
 			dueDate: '2023-07-01',
-			image: '/book-covers/1984.jpg',
+			image: mockingbirdCover,
 		},
 		{
 			id: '3',
 			title: 'To Kill a Mockingbird',
 			author: 'Harper Lee',
 			dueDate: '2023-07-15',
-			image: '/book-covers/to-kill-a-mockingbird.jpg',
+			image: nineteenEightyFourCover,
 		},
 	];
 
