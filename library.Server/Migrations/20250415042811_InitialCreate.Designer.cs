@@ -11,7 +11,7 @@ using library.Server;
 namespace library.Server.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    [Migration("20250413233939_InitialCreate")]
+    [Migration("20250415042811_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -56,6 +56,9 @@ namespace library.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Availability")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("BookId")
                         .HasColumnType("INTEGER");
 
@@ -81,7 +84,7 @@ namespace library.Server.Migrations
                     b.Property<DateTime>("ReturnDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
@@ -129,9 +132,6 @@ namespace library.Server.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
@@ -158,6 +158,12 @@ namespace library.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -170,7 +176,7 @@ namespace library.Server.Migrations
             modelBuilder.Entity("library.Server.BookCopy", b =>
                 {
                     b.HasOne("library.Server.Book", "Book")
-                        .WithMany()
+                        .WithMany("BookCopies")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -187,7 +193,7 @@ namespace library.Server.Migrations
                         .IsRequired();
 
                     b.HasOne("library.Server.User", "User")
-                        .WithMany()
+                        .WithMany("Borrowings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -206,7 +212,7 @@ namespace library.Server.Migrations
                         .IsRequired();
 
                     b.HasOne("library.Server.User", "User")
-                        .WithMany()
+                        .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -214,6 +220,18 @@ namespace library.Server.Migrations
                     b.Navigation("Copy");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("library.Server.Book", b =>
+                {
+                    b.Navigation("BookCopies");
+                });
+
+            modelBuilder.Entity("library.Server.User", b =>
+                {
+                    b.Navigation("Borrowings");
+
+                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

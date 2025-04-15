@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using static library.Server.User;
 
 namespace library.Server
 {
@@ -20,7 +22,7 @@ namespace library.Server
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "library.db");
+            DbPath = Path.Join(path, "library.db");
         }
 
         // The following configures EF to create a Sqlite database file in the
@@ -38,88 +40,97 @@ namespace library.Server
         //}
     }
 
-    public class User
+    public class User(string username, string password, string email, User.RoleEnum role, User.StatusEnum status = 0)
     {
-        public enum Role
+        public enum RoleEnum
         {
-            Admin,
-            Bibliotekarz,
-            Czytelnik
+            Czytelnik = 0,
+            Bibliotekarz = 1,
+            Admin = 2
         }
 
-        public enum Status
+        public enum StatusEnum
         {
-            Aktywny,
-            Zablokowany
+            Aktywny = 0,
+            Zablokowany = 1
         }
 
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Email { get; set; }
+        public string Username { get; set; } = username;
+        public string Password { get; set; } = password;
+        public string Email { get; set; } = email;
+        public RoleEnum Role { get; set; } = role;
+        public StatusEnum Status { get; set; } = status;
+
+        public List<Reservation> Reservations { get; } = new();
+        public List<Borrow> Borrowings { get; } = new();
     }
 
-    public class Book
+    public class Book(string title, string author, string genre, string isbn, int copies = 1)
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public string Genre { get; set; }
-        public string Isbn { get; set; }
-        public int Copies { get; set; }
+        public string Title { get; set; } = title;
+        public string Author { get; set; } = author;
+        public string Genre { get; set; } = genre;
+        public string Isbn { get; set; } = isbn;
+        public int Copies { get; set; } = copies;
 
+        public List<BookCopy> BookCopies { get; } = new();
     }
 
-    public class BookCopy
+    public class BookCopy(int bookId, BookCopy.AvailabilityEnum availability = 0)
     {
-        public int Id {  get; set; }
-        public enum Availability {
-            Dostępna,
-            Wypożyczona,
-            Zarezerwowana,
-            Wycofana
+        public enum AvailabilityEnum
+        {
+            Dostępna = 0,
+            Wypożyczona = 1,
+            Zarezerwowana = 2,
+            Wycofana = 3
         }
 
-        public int BookId { get; set; }
+        public int Id { get; set; }
+        public int BookId { get; set; } = bookId;
+        public AvailabilityEnum Availability { get; set; } = availability;
+
         public Book Book { get; set; }
     }
 
-    public class Reservation
+    public class Reservation(DateTime reservationDate, int copyId, int userId)
     {
-        public int Id {  get; set; }
-        public DateTime ReservationDate { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; } = userId;
+        public int CopyId { get; set; } = copyId;
+        public DateTime ReservationDate { get; set; } = reservationDate;
 
-        public int UnitId { get; set; }
         public BookCopy Copy { get; set; }
-
-        public int UserId { get; set; }
         public User User { get; set; }
     }
 
-    public class Borrow
+    public class Borrow(DateTime borrowDate, DateTime returnDate, Borrow.StatusEnum status, int copyId, int userId)
     {
-        public int Id { get; set; }
-        public DateTime BorrowDate { get; set; }
-        public enum Status
+        public enum StatusEnum
         {
-            Wypożyczona,
-            Zwrócona
+            Wypożyczona = 0,
+            Zwrócona = 1
         }
-        public DateTime ReturnDate { get; set; }
 
-        public int UnitId { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; } = userId;
+        public int CopyId { get; set; } = copyId;
+        public DateTime BorrowDate { get; set; } = borrowDate;
+        public DateTime ReturnDate { get; set; } = returnDate;
+        public StatusEnum Status { get; set; } = status;
+
         public BookCopy Copy { get; set; }
-
-        public int UserId { get; set; }
         public User User { get; set; }
     }
 
-    public class Log
+    public class Log(int userId, string action, DateTime timeStamp)
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public string Action { get; set; }
-        public DateTime TimeStamp { get; set; }
+        public int UserId { get; set; } = userId;
+        public string Action { get; set; } = action;
+        public DateTime TimeStamp { get; set; } = timeStamp;
     }
 
 }
