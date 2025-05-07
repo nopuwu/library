@@ -1,6 +1,10 @@
-@library.Server_HostAddress = http://localhost:5237
+@library.Server_HostAddress = https://localhost:7137
 
 GET {{library.Server_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+GET {{library.Server_HostAddress}}/books
 
 ###

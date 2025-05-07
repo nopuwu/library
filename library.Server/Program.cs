@@ -1,7 +1,9 @@
 using System;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace library.Server
@@ -10,41 +12,50 @@ namespace library.Server
     {
         public static async Task Main(string[] args)
         {
-            //var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
-            //// Add services to the container.
+            // Add services to the container.
 
-            //builder.Services.AddControllers();
-            //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            //builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddSwaggerGen();
+            builder.Services.AddControllers();
+            builder.Services.AddAuthorization();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-            //var app = builder.Build();
+            builder.Services.AddDbContext<LibraryContext>(options =>
+            options.UseSqlite($"Data Source={Path.Join(Environment
+            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "library.db")}"));
 
-            //app.UseDefaultFiles();
-            //app.UseStaticFiles();
+            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+            .AddEntityFrameworkStores<LibraryContext>();
 
-            //// Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            //{
-            //    app.UseSwagger();
-            //    app.UseSwaggerUI();
-            //}
+            var app = builder.Build();
 
-            //app.UseHttpsRedirection();
+            app.MapIdentityApi<IdentityUser>();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
-            //app.UseAuthorization();
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseAuthorization();
 
 
-            //app.MapControllers();
+            app.MapControllers();
 
-            //app.MapFallbackToFile("/index.html");
+            app.MapFallbackToFile("/index.html");
 
-            //app.Run();
+            app.Run();
 
-            using var db = new LibraryContext();
+            //using var db = new LibraryContext();
 
-            Console.WriteLine($"Database path: {db.DbPath}.");
+            //Console.WriteLine($"Database path: {db.DbPath}.");
 
             //AddUser(db, "mwalecki", "123321", "mwalecki@gmail.com", 2);
             //AddUser(db, "mwaleckiii", "12332111", "mwaleckiii@gmail.com", 0);
@@ -86,44 +97,44 @@ namespace library.Server
             //}
         }
 
-        public static async void AddUser(LibraryContext db, string Username, string Password, string Email, int Role)
-        {
-            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Email))
-            {
-                Console.WriteLine("\nAll fields are required.");
-                AddLog(db, -1, "Tried to add a user without filling out required fields.", DateTime.Now);
-                return;
-            }
-            if (db.Users.Any(u => u.Username == Username))
-            {
-                Console.WriteLine("\nUser with this username already exists.");
-                AddLog(db, -1, "Tried to add a user with username that already exists.", DateTime.Now);
-                return;
-            }
-            if (db.Users.Any(u => u.Email == Email))
-            {
-                Console.WriteLine("\nUser with this email already exists.");
-                AddLog(db, -1, "Tried to add a user with email that already exists.", DateTime.Now);
-                return;
-            }
-            if (Role < 0 || Role > 2)
-            {
-                Console.WriteLine("\nInvalid role.");
-                AddLog(db, -1, "Tried to add a user with invalid role.", DateTime.Now);
-                return;
-            }
+        //public static async void AddUser(LibraryContext db, string Username, string Password, string Email, int Role)
+        //{
+        //    if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Email))
+        //    {
+        //        Console.WriteLine("\nAll fields are required.");
+        //        AddLog(db, -1, "Tried to add a user without filling out required fields.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (db.Users.Any(u => u.Username == Username))
+        //    {
+        //        Console.WriteLine("\nUser with this username already exists.");
+        //        AddLog(db, -1, "Tried to add a user with username that already exists.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (db.Users.Any(u => u.Email == Email))
+        //    {
+        //        Console.WriteLine("\nUser with this email already exists.");
+        //        AddLog(db, -1, "Tried to add a user with email that already exists.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (Role < 0 || Role > 2)
+        //    {
+        //        Console.WriteLine("\nInvalid role.");
+        //        AddLog(db, -1, "Tried to add a user with invalid role.", DateTime.Now);
+        //        return;
+        //    }
 
-            // Maybe later implement hashing for passwords
-            Console.WriteLine($"\nInserting a new user: {Username}, {Password}, {Role}, {Email}.");
-            db.Add(new User(Username, Password, Email, (User.RoleEnum)Role));
-            await db.SaveChangesAsync();
-            Console.WriteLine("User added successfully!");
+        //    // Maybe later implement hashing for passwords
+        //    Console.WriteLine($"\nInserting a new user: {Username}, {Password}, {Role}, {Email}.");
+        //    db.Add(new User(Username, Password, Email, (User.RoleEnum)Role));
+        //    await db.SaveChangesAsync();
+        //    Console.WriteLine("User added successfully!");
 
-            var user = db.Users.First(u => u.Username == Username && u.Email == Email && u.Role == (User.RoleEnum)Role);
-            AddLog(db, user.Id, "User registered.", DateTime.Now);
+        //    var user = db.Users.First(u => u.Username == Username && u.Email == Email && u.Role == (User.RoleEnum)Role);
+        //    AddLog(db, user.Id, "User registered.", DateTime.Now);
 
-            return;
-        }
+        //    return;
+        //}
 
         //public static async void ModifyUser()
         //{
@@ -139,61 +150,61 @@ namespace library.Server
         //    return;
         //}
 
-        public static async void AddBook(LibraryContext db, User user, string Title, string Author, string Genre, string ISBN)
-        {
-            if (user.Role != User.RoleEnum.Bibliotekarz && user.Role != User.RoleEnum.Admin)
-            {
-                Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book! User doesn't have permission!");
-                AddLog(db, user.Id, "Tried to add a book.", DateTime.Now);
-                return;
-            }
-            if (string.IsNullOrEmpty(Title) || string.IsNullOrEmpty(Author) || string.IsNullOrEmpty(Genre) || string.IsNullOrEmpty(ISBN))
-            {
-                Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book without filling out required fields!");
-                AddLog(db, user.Id, "Tried to add a book without filling out required fields.", DateTime.Now);
-                return;
-            }
-            if (db.Books.Any(b => b.Isbn == ISBN))
-            {
-                Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book with the same ISBN as another book!");
-                AddLog(db, user.Id, "Tried to add a book with the same ISBN as another book.", DateTime.Now);
-                return;
-            }
-            if (db.Books.Any(b => b.Title == Title && b.Author == Author && b.Genre == Genre))
-            {
-                Console.WriteLine($"\nInserting a new book copy: {Title}, {Author}, {Genre}, {ISBN}.");
-                int copies = db.Books.Count();
-                var bookQuery = await db.Books.Where(b => b.Title == Title && b.Author == Author && b.Genre == Genre).FirstAsync();
-                bookQuery.Copies = ++copies;
+        //public static async void AddBook(LibraryContext db, User user, string Title, string Author, string Genre, string ISBN)
+        //{
+        //    if (user.Role != User.RoleEnum.Bibliotekarz && user.Role != User.RoleEnum.Admin)
+        //    {
+        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book! User doesn't have permission!");
+        //        AddLog(db, user.Id, "Tried to add a book.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (string.IsNullOrEmpty(Title) || string.IsNullOrEmpty(Author) || string.IsNullOrEmpty(Genre) || string.IsNullOrEmpty(ISBN))
+        //    {
+        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book without filling out required fields!");
+        //        AddLog(db, user.Id, "Tried to add a book without filling out required fields.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (db.Books.Any(b => b.Isbn == ISBN))
+        //    {
+        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book with the same ISBN as another book!");
+        //        AddLog(db, user.Id, "Tried to add a book with the same ISBN as another book.", DateTime.Now);
+        //        return;
+        //    }
+        //    if (db.Books.Any(b => b.Title == Title && b.Author == Author && b.Genre == Genre))
+        //    {
+        //        Console.WriteLine($"\nInserting a new book copy: {Title}, {Author}, {Genre}, {ISBN}.");
+        //        int copies = db.Books.Count();
+        //        var bookQuery = await db.Books.Where(b => b.Title == Title && b.Author == Author && b.Genre == Genre).FirstAsync();
+        //        bookQuery.Copies = ++copies;
 
-                BookCopy bookCopy = new(bookQuery.Id);
-                db.Add(bookCopy);
+        //        BookCopy bookCopy = new(bookQuery.Id);
+        //        db.Add(bookCopy);
 
-                await db.SaveChangesAsync();
-                Console.WriteLine("Book copy added successfully!");
+        //        await db.SaveChangesAsync();
+        //        Console.WriteLine("Book copy added successfully!");
 
-                AddLog(db, user.Id, "Book copy added.", DateTime.Now);
+        //        AddLog(db, user.Id, "Book copy added.", DateTime.Now);
 
-                return;
-            }
-            else
-            {
-                Console.WriteLine($"\nInserting a new book: {Title}, {Author}, {Genre}, {ISBN}.");
-                Book book = new(Title, Author, Genre, ISBN);
-                db.Add(book);
-                await db.SaveChangesAsync();
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine($"\nInserting a new book: {Title}, {Author}, {Genre}, {ISBN}.");
+        //        Book book = new(Title, Author, Genre, ISBN);
+        //        db.Add(book);
+        //        await db.SaveChangesAsync();
 
-                BookCopy bookCopy = new(book.Id);
-                db.Add(bookCopy);
-                await db.SaveChangesAsync();
+        //        BookCopy bookCopy = new(book.Id);
+        //        db.Add(bookCopy);
+        //        await db.SaveChangesAsync();
 
-                Console.WriteLine("Book added successfully!");
+        //        Console.WriteLine("Book added successfully!");
 
-                AddLog(db, user.Id, "Book added.", DateTime.Now);
+        //        AddLog(db, user.Id, "Book added.", DateTime.Now);
 
-                return;
-            }
-        }
+        //        return;
+        //    }
+        //}
 
         //public static async void ModifyBook(LibraryContext db)
         //{
@@ -233,17 +244,17 @@ namespace library.Server
         //    return;
         //}
 
-        public static async void AddLog(LibraryContext db, int UserId, string Action, DateTime timestamp)
-        {
-            Console.WriteLine("Adding new log...");
-            Log log = new(UserId, Action, timestamp);
-            db.Add(log);
+        //public static async void AddLog(LibraryContext db, int UserId, string Action, DateTime timestamp)
+        //{
+        //    Console.WriteLine("Adding new log...");
+        //    Log log = new(UserId, Action, timestamp);
+        //    db.Add(log);
 
-            await db.SaveChangesAsync();
+        //    await db.SaveChangesAsync();
 
-            Console.WriteLine("Log added successfully!\n");
+        //    Console.WriteLine("Log added successfully!\n");
 
-            return;
-        }
+        //    return;
+        //}
     }
 }

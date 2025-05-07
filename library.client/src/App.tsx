@@ -8,6 +8,7 @@ import BorrowingHistory from './pages/Profile/components/BorrowingHistory';
 import FavoriteBooks from './pages/Profile/components/FavoriteBooks';
 import BooksPage from './pages/Books/BooksPage';
 
+
 const router = createBrowserRouter([
 	{
 		path: '/',
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
 	},
 	// { path: '/books', element: <Books /> },
 ]);
+
 
 function App() {
 	return <RouterProvider router={router} />;

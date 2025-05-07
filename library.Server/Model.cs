@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using static library.Server.User;
 
 namespace library.Server
 {
-    public class LibraryContext : DbContext
+    public class LibraryContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Book> Books { get; set; }
@@ -18,7 +20,7 @@ namespace library.Server
 
         public string DbPath { get; }
 
-        public LibraryContext()
+        public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
@@ -29,18 +31,9 @@ namespace library.Server
         // special "local" folder for your platform.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={DbPath}");
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<Blog>()
-        //        .HasMany(e => e.Posts)
-        //        .WithOne(e => e.Blog)
-        //        .HasForeignKey(e => e.BlogId)
-        //        .HasPrincipalKey(e => e.Id);
-        //}
     }
 
-    public class User(string username, string password, string email, User.RoleEnum role, User.StatusEnum status = 0)
+    public class User(string username, string password, string email, User.RoleEnum role = 0, User.UserStatusEnum status = 0)
     {
         public enum RoleEnum
         {
@@ -49,7 +42,7 @@ namespace library.Server
             Admin = 2
         }
 
-        public enum StatusEnum
+        public enum UserStatusEnum
         {
             Aktywny = 0,
             Zablokowany = 1
@@ -60,7 +53,7 @@ namespace library.Server
         public string Password { get; set; } = password;
         public string Email { get; set; } = email;
         public RoleEnum Role { get; set; } = role;
-        public StatusEnum Status { get; set; } = status;
+        public UserStatusEnum Status { get; set; } = status;
 
         public List<Reservation> Reservations { get; } = new();
         public List<Borrow> Borrowings { get; } = new();
@@ -72,8 +65,8 @@ namespace library.Server
         public string Title { get; set; } = title;
         public string Author { get; set; } = author;
         public string Genre { get; set; } = genre;
-        public string Isbn { get; set; } = isbn;
         public int Copies { get; set; } = copies;
+        public string Isbn { get; set; } = isbn;
 
         public List<BookCopy> BookCopies { get; } = new();
     }
@@ -106,9 +99,9 @@ namespace library.Server
         public User User { get; set; }
     }
 
-    public class Borrow(DateTime borrowDate, DateTime returnDate, Borrow.StatusEnum status, int copyId, int userId)
+    public class Borrow(DateTime borrowDate, DateTime returnDate, Borrow.BorrowingStatusEnum status, int copyId, int userId)
     {
-        public enum StatusEnum
+        public enum BorrowingStatusEnum
         {
             Wypożyczona = 0,
             Zwrócona = 1
@@ -119,7 +112,7 @@ namespace library.Server
         public int CopyId { get; set; } = copyId;
         public DateTime BorrowDate { get; set; } = borrowDate;
         public DateTime ReturnDate { get; set; } = returnDate;
-        public StatusEnum Status { get; set; } = status;
+        public BorrowingStatusEnum Status { get; set; } = status;
 
         public BookCopy Copy { get; set; }
         public User User { get; set; }
