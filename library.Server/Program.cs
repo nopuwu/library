@@ -15,7 +15,7 @@ namespace library.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Rejestracja kontrolerów MVC.
+            // Rejestracja kontrolerów.
             builder.Services.AddControllers();
 
             // Rejestracja usług autoryzacji.
