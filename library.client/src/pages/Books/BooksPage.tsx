@@ -1,54 +1,33 @@
 // src/pages/Books/BooksPage.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../../components/Header';
 import BookCard from '../../components/BookCard';
+import { getBooks } from '../../services/bookService';
+import AddBookForm from '../../components/AddBookForm';
+import Modal from '../../components/Modal';
 
-import greatGatsbyCover from '../../assets/book-covers/great-gatsby.jpg';
-import mockingbirdCover from '../../assets/book-covers/mockingbird.jpg';
-import nineteenEightyFourCover from '../../assets/book-covers/1984.jpg';
+// import greatGatsbyCover from '../../assets/book-covers/great-gatsby.jpg';
+// import mockingbirdCover from '../../assets/book-covers/mockingbird.jpg';
+// import nineteenEightyFourCover from '../../assets/book-covers/1984.jpg';
 
 interface Book {
-	id: string;
+	id: number;
 	title: string;
 	author: string;
-	coverImage: string;
-	description: string;
+	genre: string;
+	copies: number;
+	isbn: string;
 	available: boolean;
 }
 
 export default function BooksPage() {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [books, setBooks] = useState<Book[]>([
-		{
-			id: '1',
-			title: 'The Great Gatsby',
-			author: 'F. Scott Fitzgerald',
-			coverImage: greatGatsbyCover,
-			description:
-				'A story of wealth, love, and the American Dream in the 1920s.',
-			available: true,
-		},
-		{
-			id: '2',
-			title: 'To Kill a Mockingbird',
-			author: 'Harper Lee',
-			coverImage: mockingbirdCover,
-			description:
-				'A powerful story of racial injustice and moral growth.',
-			available: false,
-		},
-		{
-			id: '3',
-			title: '1984',
-			author: 'George Orwell',
-			coverImage: nineteenEightyFourCover,
-			description:
-				'A dystopian novel about totalitarianism and surveillance.',
-			available: true,
-		},
-	]);
+	const [books, setBooks] = useState<Book[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
-	const handleBorrow = (bookId: string) => {
+	const handleBorrow = (bookId: number) => {
 		setBooks(
 			books.map((book) =>
 				book.id === bookId ? { ...book, available: false } : book
@@ -58,16 +37,49 @@ export default function BooksPage() {
 		console.log(`Borrowed book ${bookId}`);
 	};
 
+	useEffect(() => {
+		const fetchBooks = async () => {
+			try {
+				const data = await getBooks();
+				const booksWithAvailability = data.map((book) => ({
+					...book,
+					available: book.copies > 0, // Assuming 'copies' indicates availability
+				}));
+				setBooks(booksWithAvailability);
+			} catch (err) {
+				setError('Failed to fetch books. Please try again later.');
+				console.error('Error fetching books:', err);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchBooks();
+	}, []);
+
 	const filteredBooks = books.filter(
 		(book) =>
 			book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			book.author.toLowerCase().includes(searchQuery.toLowerCase())
+			book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			book.genre.toLowerCase().includes(searchQuery.toLowerCase())
 	);
+
+	if (loading) return <div className='text-center py-12'>Loading...</div>;
+	if (error)
+		return <div className='text-center py-12 text-red-500'>{error}</div>;
 
 	return (
 		<div className='min-h-screen bg-gray-50'>
 			<Header />
 			<main className='container mx-auto py-8 px-4'>
+				<div className='flex justify-end mb-4'>
+					<button
+						onClick={() => setIsModalOpen(true)}
+						className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700'
+					>
+						Add Book
+					</button>
+				</div>
+
 				{/* Search Bar */}
 				<div className='mb-8'>
 					<div className='relative max-w-md mx-auto'>
@@ -116,6 +128,25 @@ export default function BooksPage() {
 					</div>
 				)}
 			</main>
+			<Modal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				title='Add New Book'
+			>
+				<AddBookForm
+					onSuccess={() => {
+						setIsModalOpen(false);
+						// refetch books after adding a new one
+						getBooks().then((data) => {
+							const booksWithAvailability = data.map((book) => ({
+								...book,
+								available: book.copies > 0,
+							}));
+							setBooks(booksWithAvailability);
+						});
+					}}
+				/>
+			</Modal>
 		</div>
 	);
 }

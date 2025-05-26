@@ -15,6 +15,16 @@ namespace library.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Pozwala na połączenie się frontendu do backendu, nie powinno być AllowAll ale z tym działa
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
+
             // Rejestracja kontrolerów.
             builder.Services.AddControllers();
 
@@ -35,6 +45,9 @@ namespace library.Server
                 .AddEntityFrameworkStores<LibraryContext>();
 
             var app = builder.Build();
+
+            // Włączenie CORS
+            app.UseCors("AllowAll");
 
             // Mapowanie endpointów Identity.
             app.MapIdentityApi<IdentityUser>();

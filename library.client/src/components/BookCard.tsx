@@ -2,27 +2,23 @@
 import { Link } from 'react-router-dom';
 
 interface Book {
-	id: string;
+	id: number;
 	title: string;
 	author: string;
-	coverImage: string;
-	description: string;
+	genre: string;
+	copies: number;
+	isbn: string;
 	available: boolean;
 }
 
 interface BookCardProps {
 	book: Book;
-	onBorrow: (bookId: string) => void;
+	onBorrow: (bookId: number) => void;
 }
 
 export default function BookCard({ book, onBorrow }: BookCardProps) {
 	return (
 		<div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow'>
-			<img
-				src={book.coverImage}
-				alt={`${book.title} cover`}
-				className='w-full h-48 object-cover'
-			/>
 			<div className='p-4'>
 				<h3 className='font-bold text-lg mb-1'>
 					<Link
@@ -34,7 +30,7 @@ export default function BookCard({ book, onBorrow }: BookCardProps) {
 				</h3>
 				<p className='text-gray-600 text-sm mb-2'>by {book.author}</p>
 				<p className='text-gray-700 text-sm mb-4 line-clamp-2'>
-					{book.description}
+					{book.genre}
 				</p>
 				<div className='flex justify-between items-center'>
 					<span
