@@ -9,6 +9,7 @@ using library.Server;
 
 namespace library.Server.Controllers
 {
+    // Kontroler API do zarządzania rezerwacjami książek.
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase
@@ -20,6 +21,7 @@ namespace library.Server.Controllers
             _context = context;
         }
 
+        // Pobiera listę wszystkich rezerwacji.
         // GET: api/Reservations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
@@ -27,6 +29,7 @@ namespace library.Server.Controllers
             return await _context.Reservations.ToListAsync();
         }
 
+        // Pobiera rezerwację o określonym ID.
         // GET: api/Reservations/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> GetReservation(int id)
@@ -41,6 +44,7 @@ namespace library.Server.Controllers
             return reservation;
         }
 
+        // Aktualizuje dane rezerwacji o określonym ID.
         // PUT: api/Reservations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +76,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Tworzy nową rezerwację.
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -83,6 +88,7 @@ namespace library.Server.Controllers
             return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation);
         }
 
+        // Usuwa rezerwację o określonym ID.
         // DELETE: api/Reservations/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(int id)
@@ -99,6 +105,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Sprawdza, czy rezerwacja o określonym ID istnieje.
         private bool ReservationExists(int id)
         {
             return _context.Reservations.Any(e => e.Id == id);

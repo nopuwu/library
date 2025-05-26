@@ -9,6 +9,8 @@ using static library.Server.User;
 
 namespace library.Server
 {
+    // Główna klasa kontekstu bazy danych — zarządza połączeniem z bazą oraz mapowaniem modeli na tabele.
+    // Dziedziczy po IdentityDbContext, co umożliwia integrację z systemem tożsamości ASP.NET (logowanie, role itd.).
     public class LibraryContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<User> Users { get; set; }
@@ -20,6 +22,7 @@ namespace library.Server
 
         public string DbPath { get; }
 
+        // Ustawia ścieżkę do bazy danych SQLite w folderze lokalnych danych aplikacji użytkownika.
         public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
@@ -27,12 +30,12 @@ namespace library.Server
             DbPath = Path.Join(path, "library.db");
         }
 
-        // The following configures EF to create a Sqlite database file in the
-        // special "local" folder for your platform.
+        // Konfiguruje bazę danych jako plik SQLite w podanej ścieżce.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={DbPath}");
     }
 
+    // Reprezentuje użytkownika w systemie biblioteki. Może to być czytelnik, bibliotekarz lub administrator.
     public class User(string username, string password, string email, User.RoleEnum role = 0, User.UserStatusEnum status = 0)
     {
         public enum RoleEnum
@@ -48,29 +51,33 @@ namespace library.Server
             Zablokowany = 1
         }
 
-        public int Id { get; set; }
+        public int Id { get; set; } // Klucz główny
         public string Username { get; set; } = username;
         public string Password { get; set; } = password;
         public string Email { get; set; } = email;
         public RoleEnum Role { get; set; } = role;
         public UserStatusEnum Status { get; set; } = status;
 
+        // Nawigacyjne właściwości do powiązanych encji
         public List<Reservation> Reservations { get; } = new();
         public List<Borrow> Borrowings { get; } = new();
     }
 
+    // Reprezentuje książkę w bibliotece. Książka może mieć wiele fizycznych egzemplarzy (BookCopy).
     public class Book(string title, string author, string genre, string isbn, int copies = 1)
     {
-        public int Id { get; set; }
+        public int Id { get; set; } // Klucz główny
         public string Title { get; set; } = title;
         public string Author { get; set; } = author;
         public string Genre { get; set; } = genre;
-        public int Copies { get; set; } = copies;
+        public int Copies { get; set; } = copies; // Liczba dostępnych kopii
         public string Isbn { get; set; } = isbn;
 
+        // Lista wszystkich egzemplarzy tej książki
         public List<BookCopy> BookCopies { get; } = new();
     }
 
+    // Reprezentuje fizyczny egzemplarz książki — może być wypożyczony, dostępny, zarezerwowany lub wycofany.
     public class BookCopy(int bookId, BookCopy.AvailabilityEnum availability = 0)
     {
         public enum AvailabilityEnum
@@ -81,24 +88,26 @@ namespace library.Server
             Wycofana = 3
         }
 
-        public int Id { get; set; }
-        public int BookId { get; set; } = bookId;
+        public int Id { get; set; } // Klucz główny
+        public int BookId { get; set; } = bookId; // Klucz obcy do Book
         public AvailabilityEnum Availability { get; set; } = availability;
 
-        public Book Book { get; set; }
+        public Book Book { get; set; } // Nawigacja do książki
     }
 
+    // Reprezentuje rezerwację konkretnego egzemplarza książki przez użytkownika.
     public class Reservation(DateTime reservationDate, int copyId, int userId)
     {
-        public int Id { get; set; }
-        public int UserId { get; set; } = userId;
-        public int CopyId { get; set; } = copyId;
+        public int Id { get; set; } // Klucz główny
+        public int UserId { get; set; } = userId; // Klucz obcy do User
+        public int CopyId { get; set; } = copyId; // Klucz obcy do BookCopy
         public DateTime ReservationDate { get; set; } = reservationDate;
 
-        public BookCopy Copy { get; set; }
-        public User User { get; set; }
+        public BookCopy Copy { get; set; } // Nawigacja do kopii
+        public User User { get; set; } // Nawigacja do użytkownika
     }
 
+    // Reprezentuje wypożyczenie książki. Zawiera daty oraz status wypożyczenia.
     public class Borrow(DateTime borrowDate, DateTime returnDate, Borrow.BorrowingStatusEnum status, int copyId, int userId)
     {
         public enum BorrowingStatusEnum
@@ -107,23 +116,24 @@ namespace library.Server
             Zwrócona = 1
         }
 
-        public int Id { get; set; }
-        public int UserId { get; set; } = userId;
-        public int CopyId { get; set; } = copyId;
+        public int Id { get; set; } // Klucz główny
+        public int UserId { get; set; } = userId; // Klucz obcy do User
+        public int CopyId { get; set; } = copyId; // Klucz obcy do BookCopy
         public DateTime BorrowDate { get; set; } = borrowDate;
         public DateTime ReturnDate { get; set; } = returnDate;
         public BorrowingStatusEnum Status { get; set; } = status;
 
-        public BookCopy Copy { get; set; }
-        public User User { get; set; }
+        public BookCopy Copy { get; set; } // Nawigacja do egzemplarza
+        public User User { get; set; } // Nawigacja do użytkownika
     }
 
+    // Reprezentuje dziennik (log) zdarzeń wykonanych przez użytkownika, np. rezerwacje, wypożyczenia itp.
     public class Log(int userId, string action, DateTime timeStamp)
     {
-        public int Id { get; set; }
-        public int UserId { get; set; } = userId;
-        public string Action { get; set; } = action;
-        public DateTime TimeStamp { get; set; } = timeStamp;
+        public int Id { get; set; } // Klucz główny
+        public int UserId { get; set; } = userId; // Klucz obcy do User
+        public string Action { get; set; } = action; // Opis akcji (np. "Wypożyczenie książki")
+        public DateTime TimeStamp { get; set; } = timeStamp; // Czas wykonania akcji
     }
 
 }

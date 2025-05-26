@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -10,48 +10,60 @@ namespace library.Server
 {
     public class Program
     {
+        // Punkt wejścia aplikacji. Konfiguruje usługi i middleware.
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            // Rejestracja kontrolerów MVC.
             builder.Services.AddControllers();
+
+            // Rejestracja usług autoryzacji.
             builder.Services.AddAuthorization();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Konfiguracja Swaggera dla dokumentacji API.
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Konfiguracja Entity Framework Core z użyciem SQLite.
             builder.Services.AddDbContext<LibraryContext>(options =>
-            options.UseSqlite($"Data Source={Path.Join(Environment
-            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "library.db")}"));
+                options.UseSqlite($"Data Source={Path.Join(Environment
+                .GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "library.db")}"));
 
+            // Konfiguracja Identity dla uwierzytelniania użytkowników.
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-            .AddEntityFrameworkStores<LibraryContext>();
+                .AddEntityFrameworkStores<LibraryContext>();
 
             var app = builder.Build();
 
+            // Mapowanie endpointów Identity.
             app.MapIdentityApi<IdentityUser>();
+
+            // Obsługa plików statycznych i domyślnych.
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            // Configure the HTTP request pipeline.
+            // Konfiguracja Swaggera w środowisku deweloperskim.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+            // Przekierowanie HTTP do HTTPS.
             app.UseHttpsRedirection();
 
+            // Middleware autoryzacji.
             app.UseAuthorization();
 
-
+            // Mapowanie kontrolerów.
             app.MapControllers();
 
+            // Obsługa fallbacku dla aplikacji SPA.
             app.MapFallbackToFile("/index.html");
 
             app.Run();
+
 
             //using var db = new LibraryContext();
 

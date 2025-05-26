@@ -9,6 +9,7 @@ using library.Server;
 
 namespace library.Server.Controllers
 {
+    // Kontroler API do zarządzania wypożyczeniami książek.
     [Route("api/[controller]")]
     [ApiController]
     public class BorrowsController : ControllerBase
@@ -20,6 +21,7 @@ namespace library.Server.Controllers
             _context = context;
         }
 
+        // Pobiera listę wszystkich wypożyczeń książek.
         // GET: api/Borrows
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Borrow>>> GetBorrowings()
@@ -27,6 +29,7 @@ namespace library.Server.Controllers
             return await _context.Borrowings.ToListAsync();
         }
 
+        // Pobiera wypożyczenie książki o określonym ID.
         // GET: api/Borrows/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Borrow>> GetBorrow(int id)
@@ -41,6 +44,7 @@ namespace library.Server.Controllers
             return borrow;
         }
 
+        // Aktualizuje dane wypożyczenia książki o określonym ID.
         // PUT: api/Borrows/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +76,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Tworzy wypożyczenie książki.
         // POST: api/Borrows
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -83,6 +88,7 @@ namespace library.Server.Controllers
             return CreatedAtAction("GetBorrow", new { id = borrow.Id }, borrow);
         }
 
+        // Usuwa wypożyczenie książki o określonym ID.
         // DELETE: api/Borrows/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBorrow(int id)
@@ -99,6 +105,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Sprawdza, czy wypożyczenie książki o określonym ID istnieje.
         private bool BorrowExists(int id)
         {
             return _context.Borrowings.Any(e => e.Id == id);

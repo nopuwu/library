@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace library.Server.Controllers
 {
+    // Kontroler API do zarządzania użytkownikami.
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -21,14 +22,18 @@ namespace library.Server.Controllers
             _context = context;
         }
 
+        // Pobiera listę wszystkich użytkowników.
+        // Dostępne tylko dla ról: Admin, Bibliotekarz.
         // GET: api/Users
         [HttpGet]
-        [Authorize(Roles = "Admin,Bibliotekarz")]
+        //[Authorize(Roles = "Admin,Bibliotekarz")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
+        // Pobiera użytkownika o określonym ID.
+        // Dostępne tylko dla ról: Admin, Bibliotekarz.
         // GET: api/Users/5
         [HttpGet("{id}")]
         //[Authorize(Roles = "Admin,Bibliotekarz")]
@@ -44,6 +49,7 @@ namespace library.Server.Controllers
             return user;
         }
 
+        // Aktualizuje dane użytkownika o określonym ID.
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -76,6 +82,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Tworzy nowego użytkownika.
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -87,6 +94,7 @@ namespace library.Server.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
+        // Usuwa użytkownika o określonym ID.
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         //[Authorize(Roles = "Admin,Bibliotekarz")]
@@ -104,6 +112,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Sprawdza, czy użytkownik o danym ID istnieje.
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);

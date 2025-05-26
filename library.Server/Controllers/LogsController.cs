@@ -9,6 +9,7 @@ using library.Server;
 
 namespace library.Server.Controllers
 {
+    // Kontroler API do zarządzania logami systemu.
     [Route("api/[controller]")]
     [ApiController]
     public class LogsController : ControllerBase
@@ -20,6 +21,7 @@ namespace library.Server.Controllers
             _context = context;
         }
 
+        // Pobiera listę wszystkich logów.
         // GET: api/Logs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Log>>> GetLogs()
@@ -27,6 +29,7 @@ namespace library.Server.Controllers
             return await _context.Logs.ToListAsync();
         }
 
+        // Pobiera log o określonym ID.
         // GET: api/Logs/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Log>> GetLog(int id)
@@ -41,6 +44,7 @@ namespace library.Server.Controllers
             return log;
         }
 
+        // Aktualizuje dane logu o określonym ID.
         // PUT: api/Logs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +76,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Tworzy nowy log.
         // POST: api/Logs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -83,6 +88,7 @@ namespace library.Server.Controllers
             return CreatedAtAction("GetLog", new { id = log.Id }, log);
         }
 
+        // Usuwa log o określonym ID.
         // DELETE: api/Logs/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLog(int id)
@@ -99,6 +105,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Sprawdza, czy log o określonym ID istnieje.
         private bool LogExists(int id)
         {
             return _context.Logs.Any(e => e.Id == id);

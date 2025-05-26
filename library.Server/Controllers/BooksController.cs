@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace library.Server.Controllers
 {
+    /// Kontroler API do zarządzania książkami.
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -22,6 +23,7 @@ namespace library.Server.Controllers
             _context = context;
         }
 
+        // Pobiera listę wszystkich książek.
         // GET: api/Books
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
@@ -29,6 +31,7 @@ namespace library.Server.Controllers
             return await _context.Books.ToListAsync();
         }
 
+        // Pobiera książkę o określonym ID.
         // GET: api/Books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
@@ -43,6 +46,7 @@ namespace library.Server.Controllers
             return Ok(book);
         }
 
+        // Tworzy nową książkę lub dodaje egzemplarz, jeśli książka już istnieje.
         // POST: api/Books
         [HttpPost]
         //[Authorize(Roles = "Admin,Bibliotekarz")]
@@ -84,7 +88,7 @@ namespace library.Server.Controllers
             }
         }
 
-        // TODO: zastanowić się czy dodać tutaj edytowanie kopii książek (tylko w takim razie jak czy ścieżki nie będą zbyt mylące?) czy dodać osobny kontroler
+        // Aktualizuje dane książki o określonym ID.
         // PUT: api/Books/5
         [HttpPut("{id}")]
         //[Authorize(Roles = "Admin,Bibliotekarz")]
@@ -104,6 +108,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Usuwa książkę o określonym ID.
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
         //[Authorize(Roles = "Admin,Bibliotekarz")]
@@ -121,6 +126,7 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
+        // Sprawdza, czy książka o danym ID istnieje.
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.Id == id);
