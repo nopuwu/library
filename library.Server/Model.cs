@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using static library.Server.User;
+using Microsoft.Data.Sqlite;
 
 namespace library.Server
 {
     // Główna klasa kontekstu bazy danych — zarządza połączeniem z bazą oraz mapowaniem modeli na tabele.
-    // Dziedziczy po IdentityDbContext, co umożliwia integrację z systemem tożsamości ASP.NET (logowanie, role itd.).
-    public class LibraryContext : IdentityDbContext<IdentityUser>
+    public class LibraryContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Book> Books { get; set; }
@@ -32,11 +33,13 @@ namespace library.Server
 
         // Konfiguruje bazę danych jako plik SQLite w podanej ścieżce.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite($"Data Source={DbPath}");
+        {
+            options.UseSqlite($"Data Source={DbPath}");
+        }
     }
 
     // Reprezentuje użytkownika w systemie biblioteki. Może to być czytelnik, bibliotekarz lub administrator.
-    public class User(string username, string password, string email, User.RoleEnum role = 0, User.UserStatusEnum status = 0)
+    public class User(string username, string email, User.RoleEnum role = 0, User.UserStatusEnum status = 0)
     {
         public enum RoleEnum
         {
@@ -53,15 +56,31 @@ namespace library.Server
 
         public int Id { get; set; } // Klucz główny
         public string Username { get; set; } = username;
-        public string Password { get; set; } = password;
         public string Email { get; set; } = email;
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
         public RoleEnum Role { get; set; } = role;
         public UserStatusEnum Status { get; set; } = status;
 
         // Nawigacyjne właściwości do powiązanych encji
         public List<Reservation> Reservations { get; } = new();
         public List<Borrow> Borrowings { get; } = new();
+
+        public void SetPassword(string password)
+        {
+            using var hmac = new HMACSHA512();
+            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            PasswordSalt = hmac.Key;
+        }
+
+        public bool VerifyPassword(string password)
+        {
+            using var hmac = new HMACSHA512(PasswordSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return computedHash.SequenceEqual(PasswordHash);
+        }
     }
+
 
     // Reprezentuje książkę w bibliotece. Książka może mieć wiele fizycznych egzemplarzy (BookCopy).
     public class Book(string title, string author, string genre, string isbn, int copies = 1)

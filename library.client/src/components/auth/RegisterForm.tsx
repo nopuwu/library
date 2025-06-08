@@ -26,6 +26,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
 		try {
 			await registerUser({
+				username,
 				email,
 				password,
 			});

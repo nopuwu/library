@@ -24,6 +24,7 @@ namespace library.Server.Controllers
         // Pobiera listę wszystkich wypożyczeń książek.
         // GET: api/Borrows
         [HttpGet]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<IEnumerable<Borrow>>> GetBorrowings()
         {
             return await _context.Borrowings.ToListAsync();
@@ -48,6 +49,7 @@ namespace library.Server.Controllers
         // PUT: api/Borrows/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<IActionResult> PutBorrow(int id, Borrow borrow)
         {
             if (id != borrow.Id)
@@ -80,6 +82,7 @@ namespace library.Server.Controllers
         // POST: api/Borrows
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Borrow>> PostBorrow(Borrow borrow)
         {
             _context.Borrowings.Add(borrow);
@@ -91,6 +94,7 @@ namespace library.Server.Controllers
         // Usuwa wypożyczenie książki o określonym ID.
         // DELETE: api/Borrows/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteBorrow(int id)
         {
             var borrow = await _context.Borrowings.FindAsync(id);

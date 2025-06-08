@@ -24,6 +24,7 @@ namespace library.Server.Controllers
         // Pobiera listę wszystkich rezerwacji.
         // GET: api/Reservations
         [HttpGet]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
         {
             return await _context.Reservations.ToListAsync();
@@ -32,6 +33,7 @@ namespace library.Server.Controllers
         // Pobiera rezerwację o określonym ID.
         // GET: api/Reservations/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<Reservation>> GetReservation(int id)
         {
             var reservation = await _context.Reservations.FindAsync(id);
@@ -48,6 +50,7 @@ namespace library.Server.Controllers
         // PUT: api/Reservations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<IActionResult> PutReservation(int id, Reservation reservation)
         {
             if (id != reservation.Id)
@@ -80,6 +83,7 @@ namespace library.Server.Controllers
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Reservation>> PostReservation(Reservation reservation)
         {
             _context.Reservations.Add(reservation);
@@ -91,6 +95,7 @@ namespace library.Server.Controllers
         // Usuwa rezerwację o określonym ID.
         // DELETE: api/Reservations/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteReservation(int id)
         {
             var reservation = await _context.Reservations.FindAsync(id);

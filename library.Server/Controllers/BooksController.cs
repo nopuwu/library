@@ -49,7 +49,7 @@ namespace library.Server.Controllers
         // Tworzy nową książkę lub dodaje egzemplarz, jeśli książka już istnieje.
         // POST: api/Books
         [HttpPost]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<Book>> CreateBook(BookDto bookDto)
         {
             if (_context.Books.Any(b => b.Isbn == bookDto.Isbn))
@@ -91,7 +91,7 @@ namespace library.Server.Controllers
         // Aktualizuje dane książki o określonym ID.
         // PUT: api/Books/5
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<IActionResult> UpdateBook(int id, BookDto updatedBook)
         {
             var book = await _context.Books.FindAsync(id);
@@ -111,7 +111,7 @@ namespace library.Server.Controllers
         // Usuwa książkę o określonym ID.
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<IActionResult> DeleteBook(int id)
         {
             var book = await _context.Books.FindAsync(id);

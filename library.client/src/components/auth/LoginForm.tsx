@@ -10,7 +10,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 	onSuccess,
 	onSwitchToRegister,
 }) => {
-	const [email, setEmail] = React.useState('');
+	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -26,9 +26,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
 					Email
 				</label>
 				<input
-					type='email'
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
+					type='username'
+					value={username}
+					onChange={(e) => setUsername(e.target.value)}
 					className='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border'
 					required
 				/>

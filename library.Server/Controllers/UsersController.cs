@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using library.Server;
+using library.Server.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace library.Server.Controllers
 {
@@ -17,7 +19,7 @@ namespace library.Server.Controllers
     {
         private readonly LibraryContext _context;
 
-        public UsersController(LibraryContext context)
+        public UsersController(UserManager<IdentityUser> userManager, LibraryContext context)
         {
             _context = context;
         }
@@ -26,7 +28,7 @@ namespace library.Server.Controllers
         // Dostępne tylko dla ról: Admin, Bibliotekarz.
         // GET: api/Users
         [HttpGet]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -36,7 +38,7 @@ namespace library.Server.Controllers
         // Dostępne tylko dla ról: Admin, Bibliotekarz.
         // GET: api/Users/5
         [HttpGet("{id}")]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -53,7 +55,7 @@ namespace library.Server.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id != user.Id)
@@ -82,22 +84,10 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
-        // Tworzy nowego użytkownika.
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
         // Usuwa użytkownika o określonym ID.
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin,Bibliotekarz")]
+        [Authorize(Policy= "RequireAdminOrLibrarian")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);

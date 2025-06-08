@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace library.Server
 {
@@ -29,7 +33,11 @@ namespace library.Server
             builder.Services.AddControllers();
 
             // Rejestracja usług autoryzacji.
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminOrLibrarian", policy =>
+                    policy.RequireRole("Admin", "Bibliotekarz"));
+            });
 
             // Konfiguracja Swaggera dla dokumentacji API.
             builder.Services.AddEndpointsApiExplorer();
@@ -42,7 +50,26 @@ namespace library.Server
 
             // Konfiguracja Identity dla uwierzytelniania użytkowników.
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-                .AddEntityFrameworkStores<LibraryContext>();
+                .AddEntityFrameworkStores<LibraryContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
+
+            builder.Services.AddScoped<AuthService>();
 
             var app = builder.Build();
 
@@ -67,6 +94,7 @@ namespace library.Server
             app.UseHttpsRedirection();
 
             // Middleware autoryzacji.
+            app.UseAuthentication();
             app.UseAuthorization();
 
             // Mapowanie kontrolerów.
@@ -75,211 +103,44 @@ namespace library.Server
             // Obsługa fallbacku dla aplikacji SPA.
             app.MapFallbackToFile("/index.html");
 
+            await InitializeDatabase(app);
+
             app.Run();
-
-
-            //using var db = new LibraryContext();
-
-            //Console.WriteLine($"Database path: {db.DbPath}.");
-
-            //AddUser(db, "mwalecki", "123321", "mwalecki@gmail.com", 2);
-            //AddUser(db, "mwaleckiii", "12332111", "mwaleckiii@gmail.com", 0);
-            //AddUser(db, "mwalecki", "123321", "mwalecki@gmail.com", 0);
-
-            //Console.WriteLine("Querying for a user...");
-            //var users = db.Users;
-            //for (int i = 0; i < users.Count(); i++)
-            //{
-            //    Console.WriteLine($"User {users.ElementAt(i).Id}, username {users.ElementAt(i).Username}, password {users.ElementAt(i).Password}, email {users.ElementAt(i).Email}, role {users.ElementAt(i).Role}, status {users.ElementAt(i).Status}.");
-            //}
-
-            //Console.WriteLine("\nQuerying for a logs...");
-            //var logs = db.Logs;
-            //for (int i = 0; i < logs.Count(); i++)
-            //{
-            //    Console.WriteLine($"Log ID: {logs.ElementAt(i).Id}, Action: \"{logs.ElementAt(i).Action}\", Timestamp: {logs.ElementAt(i).TimeStamp}.");
-            //}
-
-            //for (int i = 0; i < users.Count(); i++)
-            //{
-            //    AddBook(db, users.ElementAt(i), $"Test Book{i}", "Test Author", "Test Genre", $"123456789012{i + 1}");
-            //}
-
-            //AddBook(db, users.ElementAt(0), $"Test Book{0}", "Test Author", "Test Genre", $"123456789012{0}");
-
-            //Console.WriteLine("\nQuerying for a books...");
-            //var books = db.Books;
-            //for (int i = 0; i < books.Count(); i++)
-            //{
-            //    Console.WriteLine($"Book ID: {books.ElementAt(i).Id}, Title: {books.ElementAt(i).Title}, Author: {books.ElementAt(i).Author}, Genre: {books.ElementAt(i).Genre}, ISBN: {books.ElementAt(i).Isbn}, Copies: {books.ElementAt(i).Copies}.");
-            //}
-
-            //Console.WriteLine("\nQuerying for a logs...");
-            ////logs = db.Logs;
-            //for (int i = 0; i < logs.Count(); i++)
-            //{
-            //    Console.WriteLine($"Log ID: {logs.ElementAt(i).Id}, Action: \"{logs.ElementAt(i).Action}\", Timestamp: {logs.ElementAt(i).TimeStamp}.");
-            //}
         }
 
-        //public static async void AddUser(LibraryContext db, string Username, string Password, string Email, int Role)
-        //{
-        //    if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Email))
-        //    {
-        //        Console.WriteLine("\nAll fields are required.");
-        //        AddLog(db, -1, "Tried to add a user without filling out required fields.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (db.Users.Any(u => u.Username == Username))
-        //    {
-        //        Console.WriteLine("\nUser with this username already exists.");
-        //        AddLog(db, -1, "Tried to add a user with username that already exists.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (db.Users.Any(u => u.Email == Email))
-        //    {
-        //        Console.WriteLine("\nUser with this email already exists.");
-        //        AddLog(db, -1, "Tried to add a user with email that already exists.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (Role < 0 || Role > 2)
-        //    {
-        //        Console.WriteLine("\nInvalid role.");
-        //        AddLog(db, -1, "Tried to add a user with invalid role.", DateTime.Now);
-        //        return;
-        //    }
+        static async Task InitializeDatabase(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
 
-        //    // Maybe later implement hashing for passwords
-        //    Console.WriteLine($"\nInserting a new user: {Username}, {Password}, {Role}, {Email}.");
-        //    db.Add(new User(Username, Password, Email, (User.RoleEnum)Role));
-        //    await db.SaveChangesAsync();
-        //    Console.WriteLine("User added successfully!");
+            // Upewnij się, że baza istnieje
+            await context.Database.EnsureCreatedAsync();
 
-        //    var user = db.Users.First(u => u.Username == Username && u.Email == Email && u.Role == (User.RoleEnum)Role);
-        //    AddLog(db, user.Id, "User registered.", DateTime.Now);
+            // Sprawdź czy użytkownicy już istnieją
+            if (!await context.Users.AnyAsync())
+            {
+                // Utwórz admina
+                var admin = new User("admin", "admin@gmail.com", User.RoleEnum.Admin)
+                {
+                    Status = User.UserStatusEnum.Aktywny
+                };
+                admin.SetPassword("admin"); // Hashowanie hasła
 
-        //    return;
-        //}
+                // Utwórz bibliotekarza
+                var librarian = new User("librarian", "librarian@gmail.com", User.RoleEnum.Bibliotekarz)
+                {
+                    Status = User.UserStatusEnum.Aktywny
+                };
+                librarian.SetPassword("librarian");
 
-        //public static async void ModifyUser()
-        //{
+                // Dodaj do bazy
+                context.Users.AddRange(admin, librarian);
+                await context.SaveChangesAsync();
 
-
-        //    return;
-        //}
-
-        //public static async void DeleteUser()
-        //{
-
-
-        //    return;
-        //}
-
-        //public static async void AddBook(LibraryContext db, User user, string Title, string Author, string Genre, string ISBN)
-        //{
-        //    if (user.Role != User.RoleEnum.Bibliotekarz && user.Role != User.RoleEnum.Admin)
-        //    {
-        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book! User doesn't have permission!");
-        //        AddLog(db, user.Id, "Tried to add a book.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (string.IsNullOrEmpty(Title) || string.IsNullOrEmpty(Author) || string.IsNullOrEmpty(Genre) || string.IsNullOrEmpty(ISBN))
-        //    {
-        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book without filling out required fields!");
-        //        AddLog(db, user.Id, "Tried to add a book without filling out required fields.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (db.Books.Any(b => b.Isbn == ISBN))
-        //    {
-        //        Console.WriteLine($"\nUser with ID = {user.Id} tried to add a book with the same ISBN as another book!");
-        //        AddLog(db, user.Id, "Tried to add a book with the same ISBN as another book.", DateTime.Now);
-        //        return;
-        //    }
-        //    if (db.Books.Any(b => b.Title == Title && b.Author == Author && b.Genre == Genre))
-        //    {
-        //        Console.WriteLine($"\nInserting a new book copy: {Title}, {Author}, {Genre}, {ISBN}.");
-        //        int copies = db.Books.Count();
-        //        var bookQuery = await db.Books.Where(b => b.Title == Title && b.Author == Author && b.Genre == Genre).FirstAsync();
-        //        bookQuery.Copies = ++copies;
-
-        //        BookCopy bookCopy = new(bookQuery.Id);
-        //        db.Add(bookCopy);
-
-        //        await db.SaveChangesAsync();
-        //        Console.WriteLine("Book copy added successfully!");
-
-        //        AddLog(db, user.Id, "Book copy added.", DateTime.Now);
-
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine($"\nInserting a new book: {Title}, {Author}, {Genre}, {ISBN}.");
-        //        Book book = new(Title, Author, Genre, ISBN);
-        //        db.Add(book);
-        //        await db.SaveChangesAsync();
-
-        //        BookCopy bookCopy = new(book.Id);
-        //        db.Add(bookCopy);
-        //        await db.SaveChangesAsync();
-
-        //        Console.WriteLine("Book added successfully!");
-
-        //        AddLog(db, user.Id, "Book added.", DateTime.Now);
-
-        //        return;
-        //    }
-        //}
-
-        //public static async void ModifyBook(LibraryContext db)
-        //{
-
-
-        //    return;
-        //}
-
-        //public static async void DeleteBook(LibraryContext db)
-        //{
-
-
-        //    return;
-        //}
-
-        //public static async void AddReservation(LibraryContext db)
-        //{
-
-        //    return;
-        //}
-
-        //public static async void DeleteReservation(LibraryContext db)
-        //{
-
-        //    return;
-        //}
-
-        //public static async void AddBorrowing(LibraryContext db)
-        //{
-
-        //    return;
-        //}
-
-        //public static async void ExtendBorrowing(LibraryContext db)
-        //{
-
-        //    return;
-        //}
-
-        //public static async void AddLog(LibraryContext db, int UserId, string Action, DateTime timestamp)
-        //{
-        //    Console.WriteLine("Adding new log...");
-        //    Log log = new(UserId, Action, timestamp);
-        //    db.Add(log);
-
-        //    await db.SaveChangesAsync();
-
-        //    Console.WriteLine("Log added successfully!\n");
-
-        //    return;
-        //}
+                Console.WriteLine("Dodano domyślnych użytkowników:");
+                Console.WriteLine($"- admin (rola: Admin)");
+                Console.WriteLine($"- librarian (rola: Bibliotekarz)");
+            }
+        }
     }
 }
