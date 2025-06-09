@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using library.Server.Data;
+using library.Server.Models;
 
 namespace library.Server
 {
@@ -32,6 +34,43 @@ namespace library.Server
             // Rejestracja kontrolerów.
             builder.Services.AddControllers();
 
+            // Konfiguracja Swaggera dla dokumentacji API.
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(option =>
+            {
+                option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
+            });
+
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
             // Rejestracja usług autoryzacji.
             builder.Services.AddAuthorization(options =>
             {
@@ -39,18 +78,14 @@ namespace library.Server
                     policy.RequireRole("Admin", "Bibliotekarz"));
             });
 
-            // Konfiguracja Swaggera dla dokumentacji API.
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
             // Konfiguracja Entity Framework Core z użyciem SQLite.
-            builder.Services.AddDbContext<LibraryContext>(options =>
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite($"Data Source={Path.Join(Environment
                 .GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "library.db")}"));
 
             // Konfiguracja Identity dla uwierzytelniania użytkowników.
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-                .AddEntityFrameworkStores<LibraryContext>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -111,7 +146,7 @@ namespace library.Server
         static async Task InitializeDatabase(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             // Upewnij się, że baza istnieje
             await context.Database.EnsureCreatedAsync();

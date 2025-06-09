@@ -2,22 +2,25 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using library.Server;
+using library.Server.Data;
 
 #nullable disable
 
 namespace library.Server.Migrations
 {
-    [DbContext(typeof(LibraryContext))]
-    partial class LibraryContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20250609174216_ModifyStructure")]
+    partial class ModifyStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
 
-            modelBuilder.Entity("library.Server.Book", b =>
+            modelBuilder.Entity("library.Server.Models.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +50,7 @@ namespace library.Server.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("library.Server.BookCopy", b =>
+            modelBuilder.Entity("library.Server.Models.BookCopy", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +69,7 @@ namespace library.Server.Migrations
                     b.ToTable("BookCopies");
                 });
 
-            modelBuilder.Entity("library.Server.Borrow", b =>
+            modelBuilder.Entity("library.Server.Models.Borrow", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,7 +99,7 @@ namespace library.Server.Migrations
                     b.ToTable("Borrowings");
                 });
 
-            modelBuilder.Entity("library.Server.Log", b =>
+            modelBuilder.Entity("library.Server.Models.Log", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -117,7 +120,7 @@ namespace library.Server.Migrations
                     b.ToTable("Logs");
                 });
 
-            modelBuilder.Entity("library.Server.Reservation", b =>
+            modelBuilder.Entity("library.Server.Models.Reservation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,17 +144,13 @@ namespace library.Server.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("library.Server.User", b =>
+            modelBuilder.Entity("library.Server.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -178,9 +177,9 @@ namespace library.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("library.Server.BookCopy", b =>
+            modelBuilder.Entity("library.Server.Models.BookCopy", b =>
                 {
-                    b.HasOne("library.Server.Book", "Book")
+                    b.HasOne("library.Server.Models.Book", "Book")
                         .WithMany("BookCopies")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -189,15 +188,15 @@ namespace library.Server.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("library.Server.Borrow", b =>
+            modelBuilder.Entity("library.Server.Models.Borrow", b =>
                 {
-                    b.HasOne("library.Server.BookCopy", "Copy")
+                    b.HasOne("library.Server.Models.BookCopy", "Copy")
                         .WithMany()
                         .HasForeignKey("CopyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("library.Server.User", "User")
+                    b.HasOne("library.Server.Models.User", "User")
                         .WithMany("Borrowings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -208,15 +207,15 @@ namespace library.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("library.Server.Reservation", b =>
+            modelBuilder.Entity("library.Server.Models.Reservation", b =>
                 {
-                    b.HasOne("library.Server.BookCopy", "Copy")
+                    b.HasOne("library.Server.Models.BookCopy", "Copy")
                         .WithMany()
                         .HasForeignKey("CopyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("library.Server.User", "User")
+                    b.HasOne("library.Server.Models.User", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -227,12 +226,12 @@ namespace library.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("library.Server.Book", b =>
+            modelBuilder.Entity("library.Server.Models.Book", b =>
                 {
                     b.Navigation("BookCopies");
                 });
 
-            modelBuilder.Entity("library.Server.User", b =>
+            modelBuilder.Entity("library.Server.Models.User", b =>
                 {
                     b.Navigation("Borrowings");
 

@@ -5,7 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using library.Server;
+using library.Server.Data;
+using Microsoft.AspNetCore.Authorization;
+using library.Server.Models;
+using Microsoft.AspNetCore.Identity;
+using library.Server.Dtos.Borrow;
+using library.Server.Mappers;
+using System.Security.Claims;
 
 namespace library.Server.Controllers
 {
@@ -14,9 +20,9 @@ namespace library.Server.Controllers
     [ApiController]
     public class BorrowsController : ControllerBase
     {
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public BorrowsController(LibraryContext context)
+        public BorrowsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -48,32 +54,27 @@ namespace library.Server.Controllers
         // Aktualizuje dane wypożyczenia książki o określonym ID.
         // PUT: api/Borrows/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("return/{id}")]
         [Authorize(Policy = "RequireAdminOrLibrarian")]
-        public async Task<IActionResult> PutBorrow(int id, Borrow borrow)
+        public async Task<IActionResult> ReturnBook(int id)
         {
-            if (id != borrow.Id)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var borrow = await _context.Borrowings.FindAsync(id);
+            var bookCopy = await _context.BookCopies.FindAsync(borrow.CopyId);
+            if (borrow == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
+            borrow.Status = Borrow.BorrowingStatusEnum.Zwrócona;
+            borrow.ReturnDate = DateTime.Now;
             _context.Entry(borrow).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BorrowExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            bookCopy.Availability = BookCopy.AvailabilityEnum.Dostępna;
+            _context.Entry(bookCopy).State = EntityState.Modified;
+
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -81,14 +82,33 @@ namespace library.Server.Controllers
         // Tworzy wypożyczenie książki.
         // POST: api/Borrows
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("{bookId:int}")]
         [Authorize]
-        public async Task<ActionResult<Borrow>> PostBorrow(Borrow borrow)
+        public async Task<IActionResult> PostBorrow(int bookId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest("Nieprawidłowy identyfikator użytkownika.");
+            }
+
+            var bookCopy = await _context.BookCopies.FirstOrDefaultAsync(b => b.BookId == bookId && b.Availability == BookCopy.AvailabilityEnum.Dostępna);
+            if (bookCopy == null || bookCopy.Availability != BookCopy.AvailabilityEnum.Dostępna)
+            {
+                return BadRequest("Egzemplarz książki nie jest dostępny do wypożyczenia.");
+            }
+
+            var borrow = new Borrow(DateTime.Now, DateTime.Now.AddDays(14), Borrow.BorrowingStatusEnum.Wypożyczona, bookCopy.Id, parsedUserId);
             _context.Borrowings.Add(borrow);
+
+            // Aktualizacja statusu kopii książki
+            bookCopy.Availability = BookCopy.AvailabilityEnum.Wypożyczona;
+            _context.Entry(bookCopy).State = EntityState.Modified;
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBorrow", new { id = borrow.Id }, borrow);
+
+            return CreatedAtAction("GetBorrow", new { id = borrow.Id }, borrow.MapToDto());
         }
 
         // Usuwa wypożyczenie książki o określonym ID.
@@ -109,10 +129,25 @@ namespace library.Server.Controllers
             return NoContent();
         }
 
-        // Sprawdza, czy wypożyczenie książki o określonym ID istnieje.
-        private bool BorrowExists(int id)
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Borrow>>> GetUserBorrows()
         {
-            return _context.Borrowings.Any(e => e.Id == id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest("Nieprawidłowy identyfikator użytkownika.");
+            }
+            var borrows = await _context.Borrowings
+                .Where(b => b.UserId == parsedUserId)
+                .ToListAsync();
+
+            if (borrows == null || !borrows.Any())
+            {
+                return NotFound();
+            }
+
+            return borrows;
         }
     }
 }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using library.Server;
+using library.Server.Data;
+using library.Server.Models;
 
 namespace library.Server.Controllers
 {
@@ -14,9 +16,9 @@ namespace library.Server.Controllers
     [ApiController]
     public class LogsController : ControllerBase
     {
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public LogsController(LibraryContext context)
+        public LogsController(ApplicationDbContext context)
         {
             _context = context;
         }

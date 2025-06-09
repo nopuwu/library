@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using library.Server;
+using Microsoft.AspNetCore.Authorization;
+using library.Server.Data;
+using library.Server.Models;
+using System.Security.Claims;
+using library.Server.Mappers;
 
 namespace library.Server.Controllers
 {
@@ -14,9 +19,9 @@ namespace library.Server.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public ReservationsController(LibraryContext context)
+        public ReservationsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -46,50 +51,34 @@ namespace library.Server.Controllers
             return reservation;
         }
 
-        // Aktualizuje dane rezerwacji o określonym ID.
-        // PUT: api/Reservations/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        [Authorize(Policy = "RequireAdminOrLibrarian")]
-        public async Task<IActionResult> PutReservation(int id, Reservation reservation)
-        {
-            if (id != reservation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(reservation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ReservationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // Tworzy nową rezerwację.
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("{bookId:int}")]
         [Authorize]
-        public async Task<ActionResult<Reservation>> PostReservation(Reservation reservation)
+        public async Task<ActionResult<Reservation>> PostReservation(int bookId)
         {
+            var bookCopy = await _context.BookCopies
+                .Where(bc => bc.BookId == bookId && bc.Availability == BookCopy.AvailabilityEnum.Dostępna)
+                .FirstOrDefaultAsync();
+
+            if (bookCopy == null)
+            {
+                return BadRequest("Book copy is not available.");
+            }
+
+            bookCopy.Availability = BookCopy.AvailabilityEnum.Zarezerwowana;
+
+            var reservation = new Reservation(
+                DateTime.Now,
+                bookCopy.Id,
+                int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
+            );
+
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation);
+            return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation.MapToDto());
         }
 
         // Usuwa rezerwację o określonym ID.
@@ -104,16 +93,39 @@ namespace library.Server.Controllers
                 return NotFound();
             }
 
+            var bookCopy = await _context.BookCopies.FindAsync(reservation.CopyId);
+            if (bookCopy != null)
+            {
+                bookCopy.Availability = BookCopy.AvailabilityEnum.Dostępna;
+                _context.Entry(bookCopy).State = EntityState.Modified;
+            }
+
             _context.Reservations.Remove(reservation);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // Sprawdza, czy rezerwacja o określonym ID istnieje.
-        private bool ReservationExists(int id)
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Reservation>>> GetUserReservations()
         {
-            return _context.Reservations.Any(e => e.Id == id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest("Nieprawidłowy identyfikator użytkownika.");
+            }
+
+            var reservations = await _context.Reservations
+                .Where(r => r.UserId == parsedUserId)
+                .ToListAsync();
+
+            if (reservations == null || !reservations.Any())
+            {
+                return NotFound();
+            }
+
+            return reservations;
         }
     }
 }

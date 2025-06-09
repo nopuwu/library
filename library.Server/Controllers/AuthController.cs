@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using library.Server;
+using library.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using library.Server.Dtos.AccountDto;
+using library.Server.Models;
+using library.Server.Dtos.Account;
 
 namespace library.Server.Controllers
 {
@@ -11,9 +14,9 @@ namespace library.Server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AuthController(AuthService authService, LibraryContext context)
+        public AuthController(AuthService authService, ApplicationDbContext context)
         {
             _authService = authService;
             _context = context;
@@ -21,27 +24,34 @@ namespace library.Server.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var user = _authService.Authenticate(model.Username, model.Password);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var user = await _authService.Authenticate(loginDto.Username, loginDto.Password);
 
             if (user == null)
                 return Unauthorized();
 
-            var token = _authService.GenerateToken(user);
+            var token = await _authService.GenerateToken(user);
 
-            return Ok(new { Token = token });
+            return Ok(new NewUserDto {
+                Token = token,
+                Username = user.Username,
+                Email = user.Email
+            });
         }
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
-            if (string.IsNullOrWhiteSpace(model.Username) ||
-               string.IsNullOrWhiteSpace(model.Password) ||
-               string.IsNullOrWhiteSpace(model.Email))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("All fields are required");
+                return BadRequest(ModelState);
             }
 
             if (await _context.Users.AnyAsync(u => u.Username == model.Username))
@@ -81,7 +91,7 @@ namespace library.Server.Controllers
                 }
 
                 // Konwersja stringa na enum
-                if (Enum.TryParse<library.Server.User.RoleEnum>(roleString, out var role))
+                if (Enum.TryParse<library.Server.Models.User.RoleEnum>(roleString, out var role))
                 {
                     return Ok(new
                     {
@@ -99,18 +109,5 @@ namespace library.Server.Controllers
                 return StatusCode(500, $"Error retrieving user data: {ex.Message}");
             }
         }
-    }
-
-    public class LoginModel
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class RegisterModel
-    {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
     }
 }

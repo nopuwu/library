@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using library.Server;
+using library.Server.Data;
 using library.Server.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using library.Server.Models;
 
 namespace library.Server.Controllers
 {
@@ -17,9 +18,9 @@ namespace library.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public UsersController(UserManager<IdentityUser> userManager, LibraryContext context)
+        public UsersController(UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
             _context = context;
         }

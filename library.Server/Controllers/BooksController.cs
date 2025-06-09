@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using library.Server;
+using library.Server.Data;
 using library.Server.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using library.Server.Models;
+using library.Server.Dtos.Book;
 
 namespace library.Server.Controllers
 {
@@ -16,9 +18,9 @@ namespace library.Server.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly LibraryContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public BooksController(LibraryContext context)
+        public BooksController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -28,7 +30,8 @@ namespace library.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            return await _context.Books.ToListAsync();
+            var books = await _context.Books.Include(c => c.BookCopies).ToListAsync();
+            return Ok(books);
         }
 
         // Pobiera książkę o określonym ID.
@@ -36,7 +39,7 @@ namespace library.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books.Include(c => c.BookCopies).FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)
             {
@@ -50,40 +53,58 @@ namespace library.Server.Controllers
         // POST: api/Books
         [HttpPost]
         [Authorize(Policy = "RequireAdminOrLibrarian")]
-        public async Task<ActionResult<Book>> CreateBook(BookDto bookDto)
+        public async Task<ActionResult<BookDto>> CreateBook([FromBody] CreateBookRequest bookRequest)
         {
-            if (_context.Books.Any(b => b.Isbn == bookDto.Isbn))
+            if (bookRequest.CopyCount <= 0)
             {
-                return BadRequest();
+                return BadRequest("Number of copies must be greater than zero.");
             }
-            if (_context.Books.Any(b => b.Title == bookDto.Title && b.Author == bookDto.Author && b.Genre == bookDto.Genre && b.Isbn == bookDto.Isbn))
+            var existingBook = await _context.Books
+                .FirstOrDefaultAsync(b => b.Title == bookRequest.Book.Title && b.Author == bookRequest.Book.Author && b.Isbn == bookRequest.Book.Isbn);
+            if (existingBook != null)
             {
-                //int copies = _context.Books.Count(b => b.Title == bookDto.Title && b.Author == bookDto.Author && b.Genre == bookDto.Genre);
-                var originalBook = await _context.Books.FirstOrDefaultAsync(b => b.Title == bookDto.Title && b.Author == bookDto.Author && b.Genre == bookDto.Genre);
-                ++originalBook.Copies;
-
-                BookCopy bookCopy = new(originalBook.Id);
-                _context.Add(bookCopy);
-
+                // Jeśli książka już istnieje, dodaj nowy egzemplarz.
+                for (int i = 0; i < bookRequest.CopyCount; i++)
+                {
+                    BookCopy bookCopy = new BookCopy(existingBook.Id, BookCopy.AvailabilityEnum.Dostępna);
+                    _context.BookCopies.Add(bookCopy);
+                }
+                existingBook.Copies += bookRequest.CopyCount; // Aktualizuj liczbę egzemplarzy
                 await _context.SaveChangesAsync();
-                return Ok();
+                return Ok(new BookDto
+                {
+                    Title = existingBook.Title,
+                    Author = existingBook.Author,
+                    Genre = existingBook.Genre,
+                    Isbn = existingBook.Isbn,
+                });
             }
             else
             {
-                Book book = new(bookDto.Title, bookDto.Author, bookDto.Genre, bookDto.Isbn);
-                _context.Add(book);
+                // Jeśli książka nie istnieje, utwórz nową książkę i dodaj egzemplarze.
+                Book newBook = new Book(
+                    bookRequest.Book.Title,
+                    bookRequest.Book.Author,
+                    bookRequest.Book.Genre,
+                    bookRequest.Book.Isbn,
+                    bookRequest.CopyCount // Ustaw liczbę egzemplarzy
+                );
+                _context.Books.Add(newBook);
                 await _context.SaveChangesAsync();
 
-                BookCopy bookCopy = new(book.Id);
-                _context.Add(bookCopy);
-                await _context.SaveChangesAsync();
+                for (int i = 0; i < bookRequest.CopyCount; i++)
+                {
+                    var newCopy = new BookCopy(newBook.Id, BookCopy.AvailabilityEnum.Dostępna);
+                    _context.BookCopies.Add(newCopy);
+                }
 
+                await _context.SaveChangesAsync();
                 return Ok(new BookDto
                 {
-                    Title = book.Title,
-                    Author = book.Author,
-                    Genre = book.Genre,
-                    Isbn = book.Isbn
+                    Title = newBook.Title,
+                    Author = newBook.Author,
+                    Genre = newBook.Genre,
+                    Isbn = newBook.Isbn,
                 });
             }
         }
