@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace library.Server.Models
 {
-        // Reprezentuje rezerwację konkretnego egzemplarza książki przez użytkownika.
+    // Reprezentuje rezerwację konkretnego egzemplarza książki przez użytkownika.
     public class Reservation(DateTime reservationDate, int copyId, int userId)
     {
         public int Id { get; set; } // Klucz główny

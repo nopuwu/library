@@ -40,7 +40,7 @@ export default function BookCard({ book, onBorrow }: BookCardProps) {
 								: 'bg-red-100 text-red-800'
 						}`}
 					>
-						{book.available ? 'Available' : 'Borrowed'}
+						{book.available ? 'Available' : 'Unavailable'}
 					</span>
 					<button
 						onClick={() => onBorrow(book.id)}

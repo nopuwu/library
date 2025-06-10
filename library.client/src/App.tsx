@@ -5,9 +5,11 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import BorrowedBooks from './pages/Profile/components/BorrowedBooks';
 import BorrowingHistory from './pages/Profile/components/BorrowingHistory';
-import FavoriteBooks from './pages/Profile/components/FavoriteBooks';
+import FavoriteBooks from './pages/Profile/components/ReserverdBooks';
 import BooksPage from './pages/Books/BooksPage';
-
+import { AuthProvider } from '../hooks/useAuth';
+import ReservedBooks from './pages/Profile/components/ReserverdBooks';
+import UsersPage from './pages/Users/UsersPage';
 
 const router = createBrowserRouter([
 	{
@@ -31,12 +33,8 @@ const router = createBrowserRouter([
 				element: <BorrowedBooks />,
 			},
 			{
-				path: 'history',
-				element: <BorrowingHistory />,
-			},
-			{
-				path: 'favorites',
-				element: <FavoriteBooks />,
+				path: 'reservation',
+				element: <ReservedBooks />,
 			},
 			{
 				index: true,
@@ -52,12 +50,22 @@ const router = createBrowserRouter([
 			</>
 		),
 	},
-	// { path: '/books', element: <Books /> },
+	{
+		path: 'users',
+		element: (
+			<>
+				<UsersPage />
+			</>
+		),
+	},
 ]);
 
-
 function App() {
-	return <RouterProvider router={router} />;
+	return (
+		<AuthProvider>
+			<RouterProvider router={router} />
+		</AuthProvider>
+	);
 }
 
 export default App;

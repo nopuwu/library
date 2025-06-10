@@ -25,14 +25,18 @@ export const postBooks = async (
 	title: string,
 	author: string,
 	isbn: string,
-	genre: string
+	genre: string,
+	copyCount: number = 1
 ): Promise<void> => {
 	try {
 		await axios.post(`${API_BASE_URL}/Books`, {
-			title,
-			author,
-			isbn,
-			genre,
+			book: {
+				title,
+				author,
+				isbn,
+				genre,
+			},
+			copyCount,
 		});
 	} catch (error) {
 		console.error('Error posting book:', error);

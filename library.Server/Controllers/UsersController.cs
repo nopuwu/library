@@ -32,7 +32,7 @@ namespace library.Server.Controllers
         [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.Include(b => b.Borrowings.Where(b => b.Status == 0)).Include(r => r.Reservations).ToListAsync();
         }
 
         // Pobiera użytkownika o określonym ID.
@@ -42,7 +42,10 @@ namespace library.Server.Controllers
         [Authorize(Policy = "RequireAdminOrLibrarian")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(b => b.Borrowings.Where(b => b.Status == 0)) 
+                .Include(r => r.Reservations)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {

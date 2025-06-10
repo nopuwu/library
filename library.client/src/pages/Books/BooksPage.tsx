@@ -5,10 +5,13 @@ import BookCard from '../../components/BookCard';
 import { getBooks } from '../../services/bookService';
 import AddBookForm from '../../components/AddBookForm';
 import Modal from '../../components/Modal';
+import { borrowBook } from '../../services/borrowService';
 
-// import greatGatsbyCover from '../../assets/book-covers/great-gatsby.jpg';
-// import mockingbirdCover from '../../assets/book-covers/mockingbird.jpg';
-// import nineteenEightyFourCover from '../../assets/book-covers/1984.jpg';
+interface BookCopy {
+	id: number;
+	bookId: number;
+	availability: number;
+}
 
 interface Book {
 	id: number;
@@ -18,6 +21,7 @@ interface Book {
 	copies: number;
 	isbn: string;
 	available: boolean;
+	bookCopies: BookCopy[];
 }
 
 export default function BooksPage() {
@@ -28,24 +32,144 @@ export default function BooksPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const handleBorrow = (bookId: number) => {
+		if (!confirm('Are you sure you want to borrow this book?')) {
+			return;
+		}
+
+		// Optimistically update the UI first
 		setBooks(
-			books.map((book) =>
-				book.id === bookId ? { ...book, available: false } : book
-			)
+			books.map((book) => {
+				if (book.id === bookId) {
+					const availableCopyIndex = book.bookCopies.findIndex(
+						(copy) => copy.availability === 0
+					);
+					if (availableCopyIndex !== -1) {
+						const updatedCopies = [...book.bookCopies];
+
+						return {
+							...book,
+							bookCopies: updatedCopies,
+							available: updatedCopies.some(
+								(copy) => copy.availability === 0
+							),
+							copies: updatedCopies.filter(
+								(copy) => copy.availability === 0
+							).length,
+						};
+					}
+				}
+				return book;
+			})
 		);
-		// In a real app, you would call your API here
-		console.log(`Borrowed book ${bookId}`);
+
+		borrowBook(bookId)
+			.then(() => {
+				// After successful borrow, refresh the data from server
+				return getBooks();
+			})
+			.then((data) => {
+				const updatedBooks = data.map((book: any) => {
+					const bookCopiesExist = 'bookCopies' in book;
+					const available = bookCopiesExist
+						? book.bookCopies.some(
+								(copy: any) => copy.availability === 0
+							)
+						: book.copies === 0;
+
+					const copies = bookCopiesExist
+						? book.bookCopies.filter(
+								(copy: any) => copy.availability === 0
+							).length
+						: book.copies === 0
+							? 1
+							: 0;
+
+					return {
+						...book,
+						available,
+						copies,
+						bookCopies: bookCopiesExist ? book.bookCopies : [],
+					};
+				});
+
+				const sortedBooks = [...updatedBooks].sort((a, b) => {
+					if (a.available === b.available) return 0;
+					return a.available ? -1 : 1;
+				});
+
+				setBooks(sortedBooks);
+			})
+			.catch((error) => {
+				console.error('Error borrowing book:', error);
+				// Revert optimistic update if there was an error
+				getBooks().then((data) => {
+					const booksWithAvailability = data.map((book: any) => {
+						const bookCopiesExist = 'bookCopies' in book;
+						const available = bookCopiesExist
+							? book.bookCopies.some(
+									(copy: any) => copy.availability === 0
+								)
+							: book.copies === 0;
+
+						const copies = bookCopiesExist
+							? book.bookCopies.filter(
+									(copy: any) => copy.availability === 0
+								).length
+							: book.copies === 0
+								? 1
+								: 0;
+
+						return {
+							...book,
+							available,
+							copies,
+							bookCopies: bookCopiesExist ? book.bookCopies : [],
+						};
+					});
+
+					setBooks(booksWithAvailability);
+				});
+			});
 	};
 
 	useEffect(() => {
 		const fetchBooks = async () => {
 			try {
 				const data = await getBooks();
-				const booksWithAvailability = data.map((book) => ({
-					...book,
-					available: book.copies > 0, // Assuming 'copies' indicates availability
-				}));
-				setBooks(booksWithAvailability);
+				const booksWithAvailability = data.map((book: any) => {
+					// Handle cases where bookCopies might be missing
+					const bookCopiesExist = 'bookCopies' in book;
+
+					// Calculate availability
+					const available = bookCopiesExist
+						? book.bookCopies.some(
+								(copy: any) => copy.availability === 0
+							)
+						: book.copies > 0;
+
+					// Calculate available copies count
+					const copies = bookCopiesExist
+						? book.bookCopies.filter(
+								(copy: any) => copy.availability === 0
+							).length
+						: book.copies;
+
+					return {
+						...book,
+						available,
+						copies,
+						// Ensure bookCopies is always defined in our state
+						bookCopies: bookCopiesExist ? book.bookCopies : [],
+					};
+				});
+
+				// Sort books: available first
+				const sortedBooks = [...booksWithAvailability].sort((a, b) => {
+					if (a.available === b.available) return 0;
+					return a.available ? -1 : 1;
+				});
+
+				setBooks(sortedBooks);
 			} catch (err) {
 				setError('Failed to fetch books. Please try again later.');
 				console.error('Error fetching books:', err);
@@ -138,11 +262,51 @@ export default function BooksPage() {
 						setIsModalOpen(false);
 						// refetch books after adding a new one
 						getBooks().then((data) => {
-							const booksWithAvailability = data.map((book) => ({
-								...book,
-								available: book.copies > 0,
-							}));
-							setBooks(booksWithAvailability);
+							const booksWithAvailability = data.map(
+								(book: any) => {
+									// Check if bookCopies exists
+									const bookCopiesExist =
+										'bookCopies' in book;
+
+									// Calculate availability (available when copy.availability === 0)
+									const available = bookCopiesExist
+										? book.bookCopies.some(
+												(copy: any) =>
+													copy.availability === 0
+											)
+										: book.copies === 0; // Fallback logic if no bookCopies
+
+									// Count available copies (where availability === 0)
+									const copies = bookCopiesExist
+										? book.bookCopies.filter(
+												(copy: any) =>
+													copy.availability === 0
+											).length
+										: book.copies === 0
+											? 1
+											: 0; // Fallback logic if no bookCopies
+
+									return {
+										...book,
+										available,
+										copies,
+										// Ensure bookCopies is always defined
+										bookCopies: bookCopiesExist
+											? book.bookCopies
+											: [],
+									};
+								}
+							);
+
+							// Sort books: available first
+							const sortedBooks = [...booksWithAvailability].sort(
+								(a, b) => {
+									if (a.available === b.available) return 0;
+									return a.available ? -1 : 1;
+								}
+							);
+
+							setBooks(sortedBooks);
 						});
 					}}
 				/>

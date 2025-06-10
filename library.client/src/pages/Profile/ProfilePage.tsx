@@ -3,31 +3,28 @@ import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import ProfilePanel from '../../components/profile/ProfilePanel';
 import Header from '../../components/Header';
+import { useAuth } from '../../../hooks/useAuth';
 
-type ProfileTab = 'borrowed' | 'history' | 'favorites';
-
-interface User {
-	id: string;
-	name: string;
-	email: string;
-	avatar: string;
-	membershipDate: string;
-	bio: string;
-}
+type ProfileTab = 'borrowed' | 'reservation';
 
 export default function ProfilePage() {
 	const [activeTab, setActiveTab] = useState<ProfileTab>('borrowed');
 	const navigate = useNavigate();
 
-	// Mock user data - replace with real data from your auth context
-	const [user, setUser] = useState<User>({
-		id: '1',
-		name: 'John Doe',
-		email: 'john@example.com',
-		avatar: '/default-avatar.jpg',
-		membershipDate: '2023-01-15',
-		bio: 'Book enthusiast and avid reader',
-	});
+	// Get user from auth context
+	const { user: authUser } = useAuth();
+
+	// Transform auth user to your profile user type with default values
+	const user = {
+		id: authUser?.email || 'unknown', // Using email as ID fallback
+		name: authUser?.username || 'Anonymous',
+		email: authUser?.email || '',
+		avatar: '/default-avatar.jpg', // Default avatar
+		membershipDate: new Date().toISOString().split('T')[0], // Today's date as default
+		bio: authUser?.username
+			? `${authUser.username}'s bio`
+			: 'No bio provided',
+	};
 
 	const handleTabChange = (tab: ProfileTab) => {
 		setActiveTab(tab);
@@ -38,8 +35,6 @@ export default function ProfilePage() {
 		<>
 			<Header />
 			<div className='min-h-screen bg-gray-50'>
-				{/* Your existing header will be rendered by the Layout component */}
-
 				<main className='container mx-auto py-8 px-4'>
 					<div className='flex flex-col md:flex-row gap-8'>
 						{/* Left Side - Profile Panel */}
@@ -53,8 +48,7 @@ export default function ProfilePage() {
 									{(
 										[
 											'borrowed',
-											'history',
-											'favorites',
+											'reservation',
 										] as ProfileTab[]
 									).map((tab) => (
 										<button

@@ -11,6 +11,7 @@ using library.Server.Data;
 using library.Server.Models;
 using System.Security.Claims;
 using library.Server.Mappers;
+using library.Server.Dtos.Reservation;
 
 namespace library.Server.Controllers
 {
@@ -108,24 +109,33 @@ namespace library.Server.Controllers
 
         [HttpGet("user")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Reservation>>> GetUserReservations()
+        public async Task<ActionResult<IEnumerable<UserReservationDto>>> GetUserReservations()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userId, out int parsedUserId))
             {
-                return BadRequest("Nieprawidłowy identyfikator użytkownika.");
+                return BadRequest("Invalid user ID format.");
             }
 
             var reservations = await _context.Reservations
                 .Where(r => r.UserId == parsedUserId)
+                .Include(r => r.Copy)
+                .ThenInclude(bc => bc.Book)
+                .Select(r => new UserReservationDto
+                {
+                    Id = r.Id,
+                    Title = r.Copy.Book.Title,
+                    Author = r.Copy.Book.Author,
+                    ReservationDate = r.ReservationDate
+                })
                 .ToListAsync();
 
-            if (reservations == null || !reservations.Any())
+            if (!reservations.Any())
             {
-                return NotFound();
+                return NotFound("No reservations found for this user.");
             }
 
-            return reservations;
+            return Ok(reservations);
         }
     }
 }

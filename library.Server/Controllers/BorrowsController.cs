@@ -131,7 +131,7 @@ namespace library.Server.Controllers
 
         [HttpGet("user")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Borrow>>> GetUserBorrows()
+        public async Task<ActionResult<IEnumerable<UserBorrowDto>>> GetUserBorrows()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userId, out int parsedUserId))
@@ -139,12 +139,22 @@ namespace library.Server.Controllers
                 return BadRequest("Nieprawidłowy identyfikator użytkownika.");
             }
             var borrows = await _context.Borrowings
-                .Where(b => b.UserId == parsedUserId)
+                .Where(b => b.UserId == parsedUserId && b.Status != Borrow.BorrowingStatusEnum.Zwrócona)
+                .Include(b => b.Copy)
+                .ThenInclude(bc => bc.Book)
+                .Select(b => new UserBorrowDto
+                {
+                    Id = b.Id,
+                    Title = b.Copy.Book.Title,
+                    Author = b.Copy.Book.Author,
+                    BorrowDate = b.BorrowDate,
+                    ReturnDate = b.ReturnDate
+                })
                 .ToListAsync();
 
-            if (borrows == null || !borrows.Any())
+            if (borrows == null)
             {
-                return NotFound();
+                return null;
             }
 
             return borrows;

@@ -11,18 +11,19 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ onSuccess, onCancel }) => {
 	const [author, setAuthor] = React.useState('');
 	const [isbn, setIsbn] = React.useState('');
 	const [genre, setGenre] = React.useState('');
+	const [copyCount, setCopyCount] = React.useState<number>(1);
 	const [error, setError] = React.useState('');
 
 	const handleAddBook = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!title || !author || !isbn || !genre) {
+		if (!title || !author || !isbn || !genre || !copyCount) {
 			setError('All fields are required');
 			console.error('All fields are required');
 			return;
 		}
 
 		try {
-			await postBooks(title, author, isbn, genre);
+			await postBooks(title, author, genre, isbn, copyCount);
 			onSuccess();
 		} catch (err) {
 			console.error('Error adding book:', err);
@@ -80,6 +81,19 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ onSuccess, onCancel }) => {
 					type='text'
 					value={genre}
 					onChange={(e) => setGenre(e.target.value)}
+					className='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border'
+					required
+				/>
+			</div>
+
+			<div>
+				<label className='block text-sm font-medium text-gray-700'>
+					Amount of Copies
+				</label>
+				<input
+					type='number'
+					value={copyCount}
+					onChange={(e) => setCopyCount(Number(e.target.value))}
 					className='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border'
 					required
 				/>
