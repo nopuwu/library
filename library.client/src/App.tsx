@@ -4,12 +4,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import BorrowedBooks from './pages/Profile/components/BorrowedBooks';
-import BorrowingHistory from './pages/Profile/components/BorrowingHistory';
-import FavoriteBooks from './pages/Profile/components/ReserverdBooks';
 import BooksPage from './pages/Books/BooksPage';
 import { AuthProvider } from '../hooks/useAuth';
 import ReservedBooks from './pages/Profile/components/ReserverdBooks';
 import UsersPage from './pages/Users/UsersPage';
+import BookSearchPage from './pages/BooksApi/BooksApi';
 
 const router = createBrowserRouter([
 	{
@@ -55,6 +54,14 @@ const router = createBrowserRouter([
 		element: (
 			<>
 				<UsersPage />
+			</>
+		),
+	},
+	{
+		path: 'BookSearchPage',
+		element: (
+			<>
+				<BookSearchPage />
 			</>
 		),
 	},

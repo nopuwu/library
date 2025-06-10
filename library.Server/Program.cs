@@ -106,6 +106,11 @@ namespace library.Server
 
             builder.Services.AddScoped<AuthService>();
 
+            builder.Services.AddHttpClient<IOpenLibraryService, OpenLibraryService>(client =>
+            {
+                client.BaseAddress = new Uri("https://openlibrary.org/");
+            });
+
             var app = builder.Build();
 
             // Włączenie CORS

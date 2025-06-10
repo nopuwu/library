@@ -2,6 +2,9 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5237/api';
 
+const authToken = localStorage.getItem('auth');
+const token = authToken ? JSON.parse(authToken).token : null;
+
 export interface Book {
 	id: number;
 	title: string;
@@ -29,16 +32,37 @@ export const postBooks = async (
 	copyCount: number = 1
 ): Promise<void> => {
 	try {
-		await axios.post(`${API_BASE_URL}/Books`, {
-			book: {
-				title,
-				author,
-				isbn,
-				genre,
+		await axios.post(
+			`${API_BASE_URL}/Books`,
+			{
+				book: {
+					title,
+					author,
+					isbn,
+					genre,
+				},
+				copyCount,
 			},
-			copyCount,
-		});
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 	} catch (error) {
 		console.error('Error posting book:', error);
+	}
+};
+
+export const fetchBooksByTitleFromApi = async (title: string) => {
+	try {
+		const response = await axios.get(
+			`${API_BASE_URL}/Books/by-title/${title}`
+		);
+		console.log('Books:', response.data);
+		return response.data;
+	} catch (error) {
+		console.error('Error fetching books:', error);
+		return [];
 	}
 };

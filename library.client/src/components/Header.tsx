@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({
 							</li>
 							<li>
 								<Link
-									to='/book-api'
+									to='/bookSearchPage'
 									className='text-gray-800 font-medium hover:text-blue-600 transition-colors'
 								>
 									Books API
