@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { getBorrowings, Borrowing } from '../../../services/borrowService';
 import BorrowingCard from '../../../components/profile/BorrowingCard';

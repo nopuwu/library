@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LoginForm from './auth/LoginForm';
 import RegisterForm from './auth/RegisterForm';
 import Modal from './Modal';
@@ -16,18 +16,13 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({
 	className,
-	userDisplayName,
-	isLoggedIn,
-	onLogin,
 	onLogout,
-	onRegister,
 }) => {
 	const [authModalOpen, setAuthModalOpen] = React.useState(false);
 	const [authMode, setAuthMode] = React.useState<'login' | 'register'>(
 		'login'
 	);
 	const { user, logout, isAuthenticated } = useAuth();
-	const navigate = useNavigate();
 
 	const handleLoginClick = () => {
 		setAuthMode('login');

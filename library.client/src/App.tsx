@@ -1,11 +1,11 @@
 import './App.css';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import BorrowedBooks from './pages/Profile/components/BorrowedBooks';
 import BooksPage from './pages/Books/BooksPage';
-import { AuthProvider, useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 import ReservedBooks from './pages/Profile/components/ReserverdBooks';
 import UsersPage from './pages/Users/UsersPage';
 import BookSearchPage from './pages/BooksApi/BooksApi';
