@@ -132,7 +132,7 @@ namespace library.Server.Controllers
 
             if (!reservations.Any())
             {
-                return NotFound("No reservations found for this user.");
+                return null;
             }
 
             return Ok(reservations);

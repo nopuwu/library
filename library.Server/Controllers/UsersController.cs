@@ -10,6 +10,7 @@ using library.Server.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using library.Server.Models;
+using library.Server.Dtos.Account;
 
 namespace library.Server.Controllers
 {
@@ -60,8 +61,19 @@ namespace library.Server.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Policy = "RequireAdminOrLibrarian")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UpdateUserDto updateUserDto)
         {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Aktualizacja pól użytkownika na podstawie DTO
+            user.Username = updateUserDto.username;
+            user.Email = updateUserDto.email;
+
+            // Sprawdzenie, czy ID w URL zgadza się z ID użytkownika
             if (id != user.Id)
             {
                 return BadRequest();

@@ -1,30 +1,27 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import BorrowedBooks from './pages/Profile/components/BorrowedBooks';
 import BooksPage from './pages/Books/BooksPage';
-import { AuthProvider } from '../hooks/useAuth';
+import { AuthProvider, useAuth } from '../hooks/useAuth';
 import ReservedBooks from './pages/Profile/components/ReserverdBooks';
 import UsersPage from './pages/Users/UsersPage';
 import BookSearchPage from './pages/BooksApi/BooksApi';
+import ProtectedRoute from './components/ProtectedRoute'; // ✅
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: (
-			<>
-				<HomePage />
-			</>
-		),
+		element: <HomePage />,
 	},
 	{
 		path: '/profile',
 		element: (
-			<>
+			<ProtectedRoute>
 				<ProfilePage />
-			</>
+			</ProtectedRoute>
 		),
 		children: [
 			{
@@ -42,37 +39,39 @@ const router = createBrowserRouter([
 		],
 	},
 	{
-		path: 'books',
+		path: '/books',
 		element: (
-			<>
+			<ProtectedRoute>
 				<BooksPage />
-			</>
+			</ProtectedRoute>
 		),
 	},
 	{
-		path: 'users',
+		path: '/users',
 		element: (
-			<>
+			<ProtectedRoute>
 				<UsersPage />
-			</>
+			</ProtectedRoute>
 		),
 	},
 	{
-		path: 'BookSearchPage',
+		path: '/BookSearchPage',
 		element: (
-			<>
+			<ProtectedRoute>
 				<BookSearchPage />
-			</>
+			</ProtectedRoute>
 		),
 	},
 ]);
 
 function App() {
-	return (
-		<AuthProvider>
-			<RouterProvider router={router} />
-		</AuthProvider>
-	);
+	const { initializeAuth } = useAuth();
+
+	useEffect(() => {
+		initializeAuth();
+	}, []);
+
+	return <RouterProvider router={router} />;
 }
 
 export default App;

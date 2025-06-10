@@ -45,7 +45,6 @@ const Header: React.FC<HeaderProps> = ({
 
 	const handleLogout = () => {
 		logout();
-		navigate('/'); // Redirect to home page after logout
 		if (onLogout) onLogout();
 	};
 

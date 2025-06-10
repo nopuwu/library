@@ -64,3 +64,27 @@ export async function deleteUser(id: number): Promise<void> {
 		throw error;
 	}
 }
+
+export async function updateUser(
+	id: number,
+	data: {
+		username: string;
+		email: string;
+	}
+) {
+	try {
+		const response = await axios.put<User>(
+			`${API_BASE_URL}/Users/${id}`,
+			data,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+		return response.data;
+	} catch (error: any) {
+		console.error(`Failed to update user ${id}:`, error);
+		throw error;
+	}
+}

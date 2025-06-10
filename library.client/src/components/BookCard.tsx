@@ -14,9 +14,10 @@ interface Book {
 interface BookCardProps {
 	book: Book;
 	onBorrow: (bookId: number) => void;
+	onReserve: (bookId: number) => void;
 }
 
-export default function BookCard({ book, onBorrow }: BookCardProps) {
+export default function BookCard({ book, onBorrow, onReserve }: BookCardProps) {
 	return (
 		<div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow'>
 			<div className='p-4'>
@@ -52,6 +53,17 @@ export default function BookCard({ book, onBorrow }: BookCardProps) {
 						}`}
 					>
 						{book.available ? 'Borrow' : 'Unavailable'}
+					</button>
+					<button
+						onClick={() => onReserve(book.id)}
+						disabled={book.copies <= 0} // Or whatever condition makes sense for your app
+						className={`px-3 py-1 rounded-md ${
+							book.copies > 0
+								? 'bg-blue-600 hover:bg-blue-700 text-white'
+								: 'bg-gray-300 text-gray-500 cursor-not-allowed'
+						}`}
+					>
+						Reserve
 					</button>
 				</div>
 			</div>

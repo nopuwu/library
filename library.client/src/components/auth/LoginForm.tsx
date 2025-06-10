@@ -9,6 +9,7 @@ interface LoginFormProps {
 }
 
 interface LoginResponse {
+	id: number;
 	username: string;
 	email: string;
 	token: string;
@@ -27,6 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 		try {
 			const response = await loginUser({ username, password });
 			login({
+				id: response.id,
 				username: response.username,
 				email: response.email,
 				token: response.token,

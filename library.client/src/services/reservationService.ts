@@ -49,7 +49,7 @@ export const createReservation = async (
 ): Promise<Reservation> => {
 	try {
 		const response = await axios.post<Reservation>(
-			`${API_BASE_URL}/api/Reservations/${bookId}`,
+			`${API_BASE_URL}/Reservations/${bookId}`,
 			{},
 			{
 				headers: {

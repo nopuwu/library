@@ -1,66 +1,137 @@
-import { createContext, ReactNode, useContext, useState, useMemo } from 'react';
+import {
+	createContext,
+	ReactNode,
+	useContext,
+	useState,
+	useMemo,
+	useEffect,
+} from 'react';
 import axios from 'axios';
 
-// Define types
 type User = {
+	id: number;
 	username: string;
 	email: string;
 };
 
 type AuthContextType = {
 	user: User | null;
-	login: (data: { username: string; email: string; token: string }) => void;
+	token: string | null;
+	login: (data: {
+		id: number;
+		username: string;
+		email: string;
+		token: string;
+	}) => void;
 	logout: () => void;
 	isAuthenticated: boolean;
+	setToken: (token: string) => void;
+	initializeAuth: () => void;
 };
 
-// Create context with initial value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Custom provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
-	const [user, setUser] = useState<User | null>(() => {
-		const saved = localStorage.getItem('auth');
-		return saved ? JSON.parse(saved).user : null;
-	});
+	const [user, setUser] = useState<User | null>(null);
+	const [token, setTokenState] = useState<string | null>(null);
+	const [isInitialized, setIsInitialized] = useState(false);
 
-	// Memoized authentication state
-	const isAuthenticated = useMemo(() => !!user, [user]);
+	// Initialize auth state from localStorage
+	const initializeAuth = () => {
+		try {
+			const saved = localStorage.getItem('auth');
+
+			if (saved) {
+				const parsed = JSON.parse(saved);
+				if (parsed.user && parsed.token) {
+					const userData = {
+						id: parsed.user.id,
+						username: parsed.user.username,
+						email: parsed.user.email,
+					};
+					setUser(userData);
+					setTokenState(parsed.token);
+				}
+			}
+		} catch (error) {
+			console.error('Failed to initialize auth:', error);
+			localStorage.removeItem('auth');
+		} finally {
+			setIsInitialized(true);
+		}
+	};
+
+	// Set up axios interceptors
+	useEffect(() => {
+		const requestInterceptor = axios.interceptors.request.use(
+			(config) => {
+				if (token) {
+					config.headers.Authorization = `Bearer ${token}`;
+				}
+				return config;
+			},
+			(error) => Promise.reject(error)
+		);
+
+		return () => {
+			axios.interceptors.request.eject(requestInterceptor);
+		};
+	}, [token]);
+
+	const isAuthenticated = useMemo(() => !!user && !!token, [user, token]);
 
 	const login = (data: {
+		id: number;
 		username: string;
 		email: string;
 		token: string;
 	}) => {
-		localStorage.setItem(
-			'auth',
-			JSON.stringify({
-				user: { username: data.username, email: data.email },
-				token: data.token,
-			})
-		);
-		setUser({ username: data.username, email: data.email });
-		axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+		const authData = {
+			user: {
+				id: data.id,
+				username: data.username,
+				email: data.email,
+			},
+			token: data.token,
+		};
+		localStorage.setItem('auth', JSON.stringify(authData));
+		setUser(authData.user);
+		setTokenState(authData.token);
+	};
+
+	const setToken = (newToken: string) => {
+		const authData = JSON.parse(localStorage.getItem('auth') || '{}');
+		authData.token = newToken;
+		localStorage.setItem('auth', JSON.stringify(authData));
+		setTokenState(newToken);
 	};
 
 	const logout = () => {
 		localStorage.removeItem('auth');
 		setUser(null);
-		delete axios.defaults.headers.common['Authorization'];
-		// Refresh the page after logout
-		window.location.reload();
+		setTokenState(null);
+		window.location.href = '/';
 	};
 
-	// Memoize the context value to prevent unnecessary re-renders
 	const contextValue = useMemo(
 		() => ({
 			user,
+			token,
 			login,
 			logout,
 			isAuthenticated,
+			setToken,
+			initializeAuth,
 		}),
-		[user, isAuthenticated]
+		[user, token, isAuthenticated]
 	);
+
+	// Initialize auth on mount
+	useEffect(() => {
+		if (!isInitialized) {
+			initializeAuth();
+		}
+	}, []);
 
 	return (
 		<AuthContext.Provider value={contextValue}>
@@ -69,7 +140,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-// Custom hook for consuming context
 export function useAuth() {
 	const context = useContext(AuthContext);
 	if (context === undefined) {

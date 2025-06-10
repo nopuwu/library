@@ -24,6 +24,7 @@ export const registerUser = async (user: UserRegister): Promise<void> => {
 export const loginUser = async (user: UserLogin) => {
 	try {
 		const response = await axios.post<{
+			id: number;
 			username: string;
 			email: string;
 			token: string;

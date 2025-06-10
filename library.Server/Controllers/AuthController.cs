@@ -39,6 +39,7 @@ namespace library.Server.Controllers
             var token = await _authService.GenerateToken(user);
 
             return Ok(new NewUserDto {
+                Id = user.Id,
                 Token = token,
                 Username = user.Username,
                 Email = user.Email

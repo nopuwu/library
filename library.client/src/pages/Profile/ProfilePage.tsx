@@ -14,16 +14,10 @@ export default function ProfilePage() {
 	// Get user from auth context
 	const { user: authUser } = useAuth();
 
-	// Transform auth user to your profile user type with default values
 	const user = {
-		id: authUser?.email || 'unknown', // Using email as ID fallback
-		name: authUser?.username || 'Anonymous',
+		id: authUser?.id || 0,
+		username: authUser?.username || '',
 		email: authUser?.email || '',
-		avatar: '/default-avatar.jpg', // Default avatar
-		membershipDate: new Date().toISOString().split('T')[0], // Today's date as default
-		bio: authUser?.username
-			? `${authUser.username}'s bio`
-			: 'No bio provided',
 	};
 
 	const handleTabChange = (tab: ProfileTab) => {
