@@ -1,0 +1,808 @@
+{
+  "source_base_path": "C:/Users/mwale/source/repos/library/docfx_project",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.AuthService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.AuthService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.AuthService",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Class.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Class.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Class",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.AuthController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.AuthController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.AuthController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.BooksController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.BooksController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.BooksController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.BorrowsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.BorrowsController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.BorrowsController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.LogsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.LogsController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.LogsController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.ReservationsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.ReservationsController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.ReservationsController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.UsersController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.UsersController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers.UsersController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Controllers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Controllers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Controllers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Data.ApplicationDbContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Data.ApplicationDbContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Data.ApplicationDbContext",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Data.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Data.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Data",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Account.NewUserDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Account.NewUserDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Account.NewUserDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Account.UpdateUserDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Account.UpdateUserDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Account.UpdateUserDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Account.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Account.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Account",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.AccountDto.LoginDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.AccountDto.LoginDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.AccountDto.LoginDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.AccountDto.RegisterDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.AccountDto.RegisterDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.AccountDto.RegisterDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.AccountDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.AccountDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.AccountDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Book.CreateBookRequest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Book.CreateBookRequest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Book.CreateBookRequest",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Book.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Book.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Book",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.BookDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.BookDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.BookDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Borrow.CreateBorrowDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Borrow.CreateBorrowDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Borrow.CreateBorrowDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Borrow.UserBorrowDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Borrow.UserBorrowDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Borrow.UserBorrowDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Borrow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Borrow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Borrow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.RegisterRequestDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.RegisterRequestDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.RegisterRequestDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Reservation.CreateReservationDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Reservation.CreateReservationDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Reservation.CreateReservationDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Reservation.UserReservationDto.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Reservation.UserReservationDto.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Reservation.UserReservationDto",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.Reservation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.Reservation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos.Reservation",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Dtos.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Dtos.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Dtos",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Interfaces.IOpenLibraryService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Interfaces.IOpenLibraryService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Interfaces.IOpenLibraryService",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Interfaces.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Interfaces.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Interfaces",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Mappers.BorrowMapper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Mappers.BorrowMapper.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Mappers.BorrowMapper",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Mappers.ReservationMapper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Mappers.ReservationMapper.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Mappers.ReservationMapper",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Mappers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Mappers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Mappers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Migrations.ModifyStructure.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Migrations.ModifyStructure.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Migrations.ModifyStructure",
+      "Summary": "<p sourcefile=\"api/library.Server.Migrations.ModifyStructure.yml\" sourcestartlinenumber=\"1\">A base class inherited by each EF Core migration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Migrations.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Migrations.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Migrations",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.AuthorOpenLibrary.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.AuthorOpenLibrary.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.AuthorOpenLibrary",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.Book.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.Book.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.Book",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.BookCopy.AvailabilityEnum.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.BookCopy.AvailabilityEnum.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.BookCopy.AvailabilityEnum",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.BookCopy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.BookCopy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.BookCopy",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.BookOpenLibrary.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.BookOpenLibrary.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.BookOpenLibrary",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.Borrow.BorrowingStatusEnum.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.Borrow.BorrowingStatusEnum.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.Borrow.BorrowingStatusEnum",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.Borrow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.Borrow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.Borrow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.Log.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.Log.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.Log",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.Reservation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.Reservation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.Reservation",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.User.RoleEnum.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.User.RoleEnum.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.User.RoleEnum",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.User.UserStatusEnum.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.User.UserStatusEnum.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.User.UserStatusEnum",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.User.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.User.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models.User",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Models.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Models.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Models",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.Program.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.Program.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server.Program",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/library.Server.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/library.Server.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "library.Server",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/architecture.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/architecture.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/overview.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/introduction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "docs/toc.html"
+        },
+        ".json": {
+          "relative_path": "docs/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
