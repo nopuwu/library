@@ -3,10 +3,9 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"proxy": "http://localhost:5237",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "NODE_ENV=production tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},

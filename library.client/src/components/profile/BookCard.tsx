@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 interface Book {
 	title: string;
 	author: string;

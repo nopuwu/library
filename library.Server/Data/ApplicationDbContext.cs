@@ -22,9 +22,7 @@ namespace library.Server.Data
         // Ustawia ścieżkę do bazy danych SQLite w folderze lokalnych danych aplikacji użytkownika.
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = Path.Join(path, "library.db");
+            DbPath = "Data/database.db";
         }
 
         // Konfiguruje bazę danych jako plik SQLite w podanej ścieżce.

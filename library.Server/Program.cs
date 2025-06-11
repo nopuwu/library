@@ -80,8 +80,7 @@ namespace library.Server
 
             // Konfiguracja Entity Framework Core z użyciem SQLite.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite($"Data Source={Path.Join(Environment
-                .GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "library.db")}"));
+                options.UseSqlite("Data Source=Data/database.db"));
 
             // Konfiguracja Identity dla uwierzytelniania użytkowników.
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()

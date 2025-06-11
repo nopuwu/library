@@ -1,6 +1,6 @@
 import axios from 'axios';
-const API_BASE_URL = 'http://localhost:5237';
 
+const API_BASE_URL = '/api';
 export interface UserRegister {
 	username: string;
 	email: string;
@@ -14,7 +14,7 @@ export interface UserLogin {
 
 export const registerUser = async (user: UserRegister): Promise<void> => {
 	try {
-		await axios.post(`${API_BASE_URL}/api/Auth/register`, user);
+		await axios.post(`${API_BASE_URL}/Auth/register`, user);
 	} catch (error) {
 		console.error('Error registering user:', error);
 		throw error;
@@ -28,7 +28,7 @@ export const loginUser = async (user: UserLogin) => {
 			username: string;
 			email: string;
 			token: string;
-		}>(`${API_BASE_URL}/api/Auth/login`, user);
+		}>(`${API_BASE_URL}/Auth/login`, user);
 		return response.data;
 	} catch (error) {
 		console.error('Error logging in user:', error);

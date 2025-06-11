@@ -8,13 +8,6 @@ interface LoginFormProps {
 	onSwitchToRegister: () => void;
 }
 
-interface LoginResponse {
-	id: number;
-	username: string;
-	email: string;
-	token: string;
-}
-
 const LoginForm: React.FC<LoginFormProps> = ({
 	onSuccess,
 	onSwitchToRegister,

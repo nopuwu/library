@@ -14,12 +14,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 	const [email, setEmail] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	const [confirmPassword, setConfirmPassword] = React.useState('');
-	const [error, setError] = React.useState('');
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (password !== confirmPassword) {
-			setError('Passwords do not match');
 			console.error('Passwords do not match');
 			return;
 		}

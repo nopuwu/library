@@ -1,0 +1,14 @@
+services:
+  library-app:
+    build:
+      context: .
+      dockerfile: library.Server/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - sqlite-data:/app/Data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+
+volumes:
+  sqlite-data:
